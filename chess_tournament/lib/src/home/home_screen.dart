@@ -1,6 +1,9 @@
+import 'dart:ffi';
+
 import 'package:chess_tournament/src/base_screen.dart';
-import 'package:chess_tournament/src/home/cart_screen.dart';
+import 'package:chess_tournament/src/home/tournament_lobby.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class HomeScreen extends BasePageScreen {
   const HomeScreen({super.key});
@@ -13,10 +16,10 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
   bool isButtonTapped = false;
 
   final tournamentCodeController = TextEditingController();
-
+  final formKey = GlobalKey<FormState>();
+  double? temp = 50;
   @override
   void initState() {
-    isBackButton(false);
     super.initState();
   }
 
@@ -26,26 +29,6 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
     return "Chess tournament planner";
   }
 
-  @override
-  void isBackButton(bool isBack) {
-    super.isBackButton(isBack);
-  }
-
-  // THIS IS BACK BUTTON CLICK HANDLER
-  @override
-  void onClickBackButton() {
-    print("BACK BUTTON CLICKED FROM HOME");
-    Navigator.of(context).pop();
-  }
-
-  // THIS IS RIGHT BAR BUTTON CLICK HANDLER
-  @override
-  void onClickCart() {
-    print("CART BUTTON CLICKED");
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => CartScreen()));
-  }
-
   // THIS WILL RETURN THE BODY OF THE SCREEN
   @override
   Widget body() {
@@ -53,31 +36,47 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SizedBox(
-              width: 300,
-              height: 50,
-              child: TextField(
-                onSubmitted: _join,
-                textAlign: TextAlign.center,
-                controller: tournamentCodeController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Enter tournament code ...',
+          Form(
+            key: formKey,
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    width: 300,
+                    height: temp,
+                    child: TextFormField(
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value != null && value.length == 6) {
+                          return null;
+                        }
+                        return 'Please enter a 6 digit code!';
+                      },
+                      textAlign: TextAlign.center,
+                      controller: tournamentCodeController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Enter tournament code ...',
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SizedBox(
-              width: 300,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: _onJoin,
-                child: const Text("Join"),
-              ),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    width: 300,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: _onJoin,
+                      child: const Text("Join"),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           const Padding(
@@ -113,8 +112,21 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
   }
 
   void _join(String value) {
-    print("you are trying to join tournament: $value");
-    // Navigator.of(context)
-    //     .push(MaterialPageRoute(builder: (context) => TournamentLobby()));
+    if (formKey.currentState!.validate()) {
+      // If the form is valid, display a snackbar. In the real world,
+      // you'd often call a server or save the information in a database.
+      print("you are trying to join tournament: $value");
+      setState(() {
+        temp = 50;
+      });
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => TournamentLobbyScreen(
+                tournamentCode: value,
+              )));
+    } else {
+      setState(() {
+        temp = 80;
+      });
+    }
   }
 }
