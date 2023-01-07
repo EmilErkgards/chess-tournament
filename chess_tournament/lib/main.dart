@@ -1,4 +1,4 @@
-import 'package:chess_tournament/src/frontend/home/home_screen.dart';
+import 'package:chess_tournament/src/frontend/pages/home.dart';
 import 'package:chess_tournament/src/frontend/themes/themes.dart';
 import 'package:flutter/material.dart';
 

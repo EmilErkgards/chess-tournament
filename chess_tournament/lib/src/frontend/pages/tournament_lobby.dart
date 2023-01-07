@@ -1,11 +1,17 @@
 import 'package:chess_tournament/src/frontend/base_screen.dart';
+import 'package:chess_tournament/src/frontend/common/base_button.dart';
+import 'package:chess_tournament/src/frontend/pages/tournament_overview.dart';
 import 'package:flutter/material.dart';
 
 class TournamentLobbyScreen extends BasePageScreen {
   final String tournamentCode;
   final bool isLeader;
+  final bool isStarted;
   const TournamentLobbyScreen(
-      {super.key, required this.tournamentCode, required this.isLeader});
+      {super.key,
+      required this.tournamentCode,
+      required this.isLeader,
+      required this.isStarted});
 
   @override
   TournamentLobbyScreenState createState() => TournamentLobbyScreenState();
@@ -23,12 +29,25 @@ class TournamentLobbyScreenState
     return "Tournament Lobby";
   }
 
+  void startTournament() {
+    //TODO start tournament
+    Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => TournamentOverviewScreen()));
+  }
+
+  void goToTournament() {
+    Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => TournamentOverviewScreen()));
+  }
+
+  void openTournamentSettings() {}
+
   late List<TournamentParticipant> participants = [
-    TournamentParticipant("Emil"),
-    TournamentParticipant("Anton"),
-    TournamentParticipant("Oskar"),
-    TournamentParticipant("Joel"),
-    TournamentParticipant("Anton"),
+    TournamentParticipant("Emil", 1215),
+    TournamentParticipant("Anton", 1500),
+    TournamentParticipant("Oskar", 420),
+    TournamentParticipant("Joel", 69),
+    TournamentParticipant("Anton", 1337),
   ];
 
   @override
@@ -46,6 +65,21 @@ class TournamentLobbyScreenState
               ),
             ),
           ),
+          if (widget.isStarted) ...{
+            BaseButton(
+              callback: goToTournament,
+              text: "Go To Tournament",
+            ),
+          } else if (widget.isLeader) ...{
+            BaseButton(
+              callback: startTournament,
+              text: "Start",
+            ),
+            BaseButton(
+              callback: openTournamentSettings,
+              text: "Tournament Settings",
+            ),
+          },
           Expanded(
             flex: 10,
             child: participantList(),
@@ -82,15 +116,17 @@ class TournamentLobbyScreenState
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        Text(participant.name),
-        Text("Rating 800"),
+        Text(participant.userName),
+        Text("Rating: " + participant.rating.toString()),
       ],
     );
   }
 }
 
 class TournamentParticipant {
-  late String name;
+  late Image profilePicture;
+  late String userName;
+  late int rating;
 
-  TournamentParticipant(this.name);
+  TournamentParticipant(this.userName, this.rating);
 }
