@@ -7,11 +7,13 @@ class TournamentLobbyScreen extends BasePageScreen {
   final String tournamentCode;
   final bool isLeader;
   final bool isStarted;
-  const TournamentLobbyScreen(
-      {super.key,
-      required this.tournamentCode,
-      required this.isLeader,
-      required this.isStarted});
+
+  const TournamentLobbyScreen({
+    super.key,
+    required this.tournamentCode,
+    required this.isLeader,
+    required this.isStarted,
+  });
 
   @override
   TournamentLobbyScreenState createState() => TournamentLobbyScreenState();

@@ -4,15 +4,16 @@ import 'package:flutter/services.dart';
 class BaseInputField extends StatefulWidget {
   final bool numbersOnly;
   final String placeholderText;
-  final validatorCallback;
+  final Function(String) validatorCallback;
   final TextEditingController textFieldController;
 
-  BaseInputField(
-      {super.key,
-      required this.numbersOnly,
-      required this.placeholderText,
-      required this.validatorCallback,
-      required this.textFieldController});
+  const BaseInputField({
+    super.key,
+    required this.numbersOnly,
+    required this.placeholderText,
+    required this.validatorCallback,
+    required this.textFieldController,
+  });
 
   @override
   State<BaseInputField> createState() => _BaseInputFieldState();

@@ -30,19 +30,19 @@ mixin BaseScreen<Page extends BasePageScreen> on BasePageScreenState<Page> {
       ),
       // bottomNavigationBar: BottomNavigationBar(items: const [
       //   BottomNavigationBarItem(
-      //     label: "temp",
+      //     label: "Sök",
       //     icon: Icon(
       //       Icons.search,
       //     ),
       //   ),
       //   BottomNavigationBarItem(
-      //     label: "temp",
+      //     label: "Hem",
       //     icon: Icon(
       //       Icons.home,
       //     ),
       //   ),
       //   BottomNavigationBarItem(
-      //     label: "temp",
+      //     label: "Konto",
       //     icon: Icon(
       //       Icons.account_circle,
       //     ),

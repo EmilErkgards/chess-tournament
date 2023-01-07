@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class BaseButton extends StatefulWidget {
-  final callback;
+  final Function() callback;
   final String text;
   const BaseButton({super.key, required this.callback, required this.text});
 

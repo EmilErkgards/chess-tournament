@@ -41,7 +41,7 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
                   numbersOnly: true,
                   placeholderText: "Enter tournament code...",
                   validatorCallback: ((value) {
-                    if (value != null && value.length == 6) {
+                    if (value.length == 6) {
                       return null;
                     }
                     //TODO: Check backend
@@ -86,12 +86,17 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
 
   void _join(String value) {
     if (formKey.currentState!.validate()) {
-      Navigator.of(context).push(MaterialPageRoute(
+      Navigator.of(context).push(
+        MaterialPageRoute(
           builder: (context) => TournamentLobbyScreen(
-                tournamentCode: value,
-                isLeader: false,
-                isStarted: true,
-              )));
-    } else {}
+            tournamentCode: value,
+            isLeader: false,
+            isStarted: true,
+          ),
+        ),
+      );
+    } else {
+      print("The tournament code does not exist");
+    }
   }
 }
