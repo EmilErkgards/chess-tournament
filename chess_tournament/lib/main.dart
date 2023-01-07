@@ -1,5 +1,5 @@
-import 'package:chess_tournament/src/home/home_screen.dart';
-import 'package:chess_tournament/src/themes/themes.dart';
+import 'package:chess_tournament/src/frontend/home/home_screen.dart';
+import 'package:chess_tournament/src/frontend/themes/themes.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'My App',
-      theme: lightTheme,
+      theme: darkTheme,
       home: HomeScreen(),
     );
   }

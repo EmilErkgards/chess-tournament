@@ -1,7 +1,5 @@
-import 'dart:ffi';
-
-import 'package:chess_tournament/src/base_screen.dart';
-import 'package:chess_tournament/src/home/tournament_lobby.dart';
+import 'package:chess_tournament/src/frontend/base_screen.dart';
+import 'package:chess_tournament/src/frontend/home/tournament_lobby.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -105,7 +103,15 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
     );
   }
 
-  void _onCreate() {}
+  void _onCreate() {
+    //Generate Code
+    const code = "112111";
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => const TournamentLobbyScreen(
+              tournamentCode: code,
+              isLeader: true,
+            )));
+  }
 
   void _onJoin() {
     _join(tournamentCodeController.text);
@@ -122,6 +128,7 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
       Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => TournamentLobbyScreen(
                 tournamentCode: value,
+                isLeader: false,
               )));
     } else {
       setState(() {
