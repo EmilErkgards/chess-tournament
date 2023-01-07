@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,8 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
     with BaseScreen {
   Timer? timer;
   bool gameIsRunning = false;
+  bool gameIsOver = false;
+  bool timeRanOut = false;
   bool whitesTurn = true;
 
   late int whitesTimeInMilliSeconds;
@@ -60,83 +63,88 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
   @override
   Widget body() {
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      child: Stack(
         children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: GestureDetector(
-                onTap: blackSwitchedTurns,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.black,
-                  ),
-                  child: Center(
-                    child: Text(
-                      blacksTime.toString(),
-                      style: const TextStyle(
-                        fontSize: 100,
+          Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: GestureDetector(
+                    onTap: blackSwitchedTurns,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.black,
+                      ),
+                      child: Center(
+                        child: Text(
+                          blacksTime.toString(),
+                          style: const TextStyle(
+                            fontSize: 100,
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              SizedBox(
-                height: 100,
-                width: 100,
-                child: ElevatedButton(
-                  onPressed: onPauseButtonPressed,
-                  child: Icon(Icons.pause),
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  SizedBox(
+                    height: 100,
+                    width: 100,
+                    child: ElevatedButton(
+                      onPressed: onPauseButtonPressed,
+                      child: Icon(Icons.pause),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 100,
+                    width: 100,
+                    child: ElevatedButton(
+                      onPressed: onPlayButtonPressed,
+                      child: Icon(Icons.play_arrow),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 100,
+                    width: 100,
+                    child: ElevatedButton(
+                      onPressed: onStopButtonPressed,
+                      child: Icon(Icons.stop),
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(
-                height: 100,
-                width: 100,
-                child: ElevatedButton(
-                  onPressed: onPlayButtonPressed,
-                  child: Icon(Icons.play_arrow),
-                ),
-              ),
-              SizedBox(
-                height: 100,
-                width: 100,
-                child: ElevatedButton(
-                  onPressed: onStopButtonPressed,
-                  child: Icon(Icons.stop),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: GestureDetector(
+                    onTap: whiteSwitchedTurns,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.grey,
+                      ),
+                      child: Center(
+                        child: Text(
+                          whitesTime.toString(),
+                          style: const TextStyle(
+                            fontSize: 100,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: GestureDetector(
-                onTap: whiteSwitchedTurns,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.grey,
-                  ),
-                  child: Center(
-                    child: Text(
-                      whitesTime.toString(),
-                      style: const TextStyle(
-                        fontSize: 100,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
+          if (gameIsOver) showGameOverDialog(),
         ],
       ),
     );
@@ -183,8 +191,9 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
 
   String checkTimeAndReturnFormatted(int timeInMilliseconds) {
     if (timeInMilliseconds <= 0) {
+      timeRanOut = true;
       timer?.cancel();
-      matchStopped(timeRanOut: true);
+      matchStopped();
     }
     return clockFormat.format(
       DateTime.fromMillisecondsSinceEpoch(
@@ -193,7 +202,10 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
     );
   }
 
-  void matchStopped({bool timeRanOut = false}) {
+  void matchStopped() {
+    setState(() {
+      gameIsOver = true;
+    });
     if (timeRanOut) {
       if (whitesTimeInMilliSeconds <= 0) {
         print("Black won on time. Press to continue");
@@ -204,4 +216,70 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
       print("Someone won. Pick who");
     }
   }
+
+  Widget showGameOverDialog() {
+    String dialogText;
+    if (timeRanOut) {
+      if (whitesTimeInMilliSeconds <= 0) {
+        dialogText = "Black won on time!";
+      } else {
+        dialogText = "White won on time!";
+      }
+    } else {
+      dialogText = "Who won?";
+    }
+    return Positioned(
+      child: AlertDialog(
+        title: const Center(
+          child: Text("Game Over"),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Text(dialogText),
+            )
+          ],
+        ),
+        actions: [
+          if (!timeRanOut) ...{
+            ElevatedButton(
+              onPressed: () {
+                registerResult();
+                Navigator.of(context).pop();
+              },
+              child: const Text('White Won'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                registerResult();
+                Navigator.of(context).pop();
+              },
+              child: const Text('Draw'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                registerResult();
+                Navigator.of(context).pop();
+              },
+              child: const Text('Black Won'),
+            ),
+          } else ...{
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  registerResult();
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Continue'),
+              ),
+            ),
+          }
+        ],
+      ),
+    );
+  }
+
+  void registerResult() {}
 }
