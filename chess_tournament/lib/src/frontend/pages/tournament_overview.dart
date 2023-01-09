@@ -45,11 +45,11 @@ class _TournamentOverviewScreenState
   }
 
   late List<TournamentParticipant> participants = [
-    TournamentParticipant("Emil", 1215),
-    TournamentParticipant("Anton", 1500),
-    TournamentParticipant("Oskar", 420),
-    TournamentParticipant("Joel", 69),
-    TournamentParticipant("Anton", 1337),
+    TournamentParticipant(userName: "Emil", rating: "1215", id: "bla"),
+    TournamentParticipant(userName: "Anton", rating: "1500", id: "bla"),
+    TournamentParticipant(userName: "Oskar", rating: "420", id: "bla"),
+    TournamentParticipant(userName: "Joel", rating: "69", id: "bla"),
+    TournamentParticipant(userName: "Anton", rating: "1337", id: "bla"),
   ];
 
   late List<TournamentParticipant> topThree = [
@@ -91,7 +91,7 @@ class _TournamentOverviewScreenState
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        Text(participant.userName),
+        Text(participant.userName!),
         Text("W: 5, L: 2, D: 4"),
       ],
     );
@@ -129,7 +129,7 @@ class _TournamentOverviewScreenState
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Text(match.white.userName),
+              Text(match.white.userName!),
               Text("Rating: " + match.white.rating.toString()),
             ],
           ),
@@ -152,7 +152,7 @@ class _TournamentOverviewScreenState
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Text(match.black.userName),
+              Text(match.black.userName!),
               Text("Rating: " + match.black.rating.toString()),
             ],
           ),

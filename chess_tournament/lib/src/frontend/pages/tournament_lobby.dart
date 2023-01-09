@@ -1,6 +1,7 @@
 import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:chess_tournament/src/frontend/common/base_button.dart';
 import 'package:chess_tournament/src/frontend/pages/tournament_overview.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class TournamentLobbyScreen extends BasePageScreen {
@@ -44,14 +45,6 @@ class TournamentLobbyScreenState
 
   void openTournamentSettings() {}
 
-  late List<TournamentParticipant> participants = [
-    TournamentParticipant("Emil", 1215),
-    TournamentParticipant("Anton", 1500),
-    TournamentParticipant("Oskar", 420),
-    TournamentParticipant("Joel", 69),
-    TournamentParticipant("Anton", 1337),
-  ];
-
   @override
   Widget body() {
     return Center(
@@ -84,51 +77,72 @@ class TournamentLobbyScreenState
           },
           Expanded(
             flex: 10,
-            child: participantList(),
-          )
+            child: participantList(context),
+          ),
         ],
       ),
     );
   }
 
-  Widget participantList() {
-    return ListView(
-      shrinkWrap: true,
-      children: participants.map((participant) {
-        return Center(
-          child: Container(
-            width: 400,
-            height: 100,
-            margin: const EdgeInsets.all(5),
-            padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: Colors.brown,
-            ),
-            child: Center(
-              child: participantCard(participant),
-            ),
-          ),
+  Widget participantList(BuildContext context) {
+    List<TournamentParticipant> participants;
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance.collection('test').snapshots(),
+      builder: ((context, snapshot) {
+        if (!snapshot.hasData && snapshot.data!.docs.isEmpty) {
+          return const Text("Loading...");
+        }
+        participants = snapshot.data!.docs.map(
+          (doc) {
+            return TournamentParticipant.fromJSON(doc.data(), doc.id);
+          },
+        ).toList();
+        return ListView.builder(
+          shrinkWrap: true,
+          itemCount: snapshot.data!.docs.length,
+          itemBuilder: (context, index) => participantCard(participants[index]),
         );
-      }).toList(),
+      }),
     );
   }
 
   Widget participantCard(TournamentParticipant participant) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Text(participant.userName),
-        Text("Rating: " + participant.rating.toString()),
-      ],
+    return Center(
+      child: Container(
+        width: 400,
+        height: 30,
+        margin: const EdgeInsets.all(2),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          color: Colors.brown,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text(participant.userName!),
+            Text("Rating: " + participant.rating!),
+          ],
+        ),
+      ),
     );
   }
 }
 
 class TournamentParticipant {
-  late Image profilePicture;
-  late String userName;
-  late int rating;
+  // Image profilePicture;
+  String? id;
+  String? userName;
+  String? rating;
 
-  TournamentParticipant(this.userName, this.rating);
+  TournamentParticipant({
+    required this.id,
+    required this.userName,
+    required this.rating,
+  });
+
+  TournamentParticipant.fromJSON(Map<String, dynamic> snapshot, String id) {
+    id = id;
+    userName = snapshot["userName"];
+    rating = snapshot["rating"];
+  }
 }
