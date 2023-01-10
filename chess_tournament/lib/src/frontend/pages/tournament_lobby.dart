@@ -1,3 +1,4 @@
+import 'package:chess_tournament/src/backend/backend_file.dart';
 import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:chess_tournament/src/frontend/common/base_button.dart';
 import 'package:chess_tournament/src/frontend/pages/tournament_overview.dart';
@@ -85,24 +86,23 @@ class TournamentLobbyScreenState
   }
 
   Widget participantList(BuildContext context) {
-    List<TournamentParticipant> participants;
-    return StreamBuilder(
-      stream: FirebaseFirestore.instance.collection('test').snapshots(),
-      builder: ((context, snapshot) {
-        if (!snapshot.hasData && snapshot.data!.docs.isEmpty) {
-          return const Text("Loading...");
+    var participants = getTournamentParticipants(context, "");
+    return FutureBuilder(
+      future: participants,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else {
+          return ListView.builder(
+              shrinkWrap: true,
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                return participantCard(snapshot.data![index]);
+              });
         }
-        participants = snapshot.data!.docs.map(
-          (doc) {
-            return TournamentParticipant.fromJSON(doc.data(), doc.id);
-          },
-        ).toList();
-        return ListView.builder(
-          shrinkWrap: true,
-          itemCount: snapshot.data!.docs.length,
-          itemBuilder: (context, index) => participantCard(participants[index]),
-        );
-      }),
+      },
     );
   }
 
