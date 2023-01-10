@@ -1,19 +1,20 @@
+import 'dart:async';
+
 import 'package:chess_tournament/src/backend/backend_file.dart';
 import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:chess_tournament/src/frontend/common/base_button.dart';
 import 'package:chess_tournament/src/frontend/pages/tournament_overview.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class TournamentLobbyScreen extends BasePageScreen {
   final String tournamentCode;
-  final bool isLeader;
+  final bool isOwner;
   final bool isStarted;
 
   const TournamentLobbyScreen({
     super.key,
     required this.tournamentCode,
-    required this.isLeader,
+    required this.isOwner,
     required this.isStarted,
   });
 
@@ -23,9 +24,20 @@ class TournamentLobbyScreen extends BasePageScreen {
 
 class TournamentLobbyScreenState
     extends BasePageScreenState<TournamentLobbyScreen> with BaseScreen {
+  Future<List<User>>? participants;
+  Timer? fetchTimer;
+
   @override
   void initState() {
     super.initState();
+    participants = getTournamentParticipants(context, widget.tournamentCode);
+    setUpTimedFetch();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    fetchTimer?.cancel();
   }
 
   @override
@@ -33,15 +45,37 @@ class TournamentLobbyScreenState
     return "Tournament Lobby";
   }
 
-  void startTournament() {
+  //TODO: this probably wastes a lot of battery. Find a way to subscribe
+  //to changes instead
+  setUpTimedFetch() {
+    fetchTimer = Timer.periodic(
+      const Duration(milliseconds: 5000),
+      (timer) {
+        setState(
+          () {
+            participants =
+                getTournamentParticipants(context, widget.tournamentCode);
+          },
+        );
+      },
+    );
+  }
+
+  void startTournament() async {
     //TODO start tournament
     Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => TournamentOverviewScreen()));
+      MaterialPageRoute(
+        builder: (context) => const TournamentOverviewScreen(),
+      ),
+    );
   }
 
   void goToTournament() {
     Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => TournamentOverviewScreen()));
+      MaterialPageRoute(
+        builder: (context) => const TournamentOverviewScreen(),
+      ),
+    );
   }
 
   void openTournamentSettings() {}
@@ -66,7 +100,7 @@ class TournamentLobbyScreenState
               callback: goToTournament,
               text: "Go To Tournament",
             ),
-          } else if (widget.isLeader) ...{
+          } else if (widget.isOwner) ...{
             BaseButton(
               callback: startTournament,
               text: "Start",
@@ -86,7 +120,6 @@ class TournamentLobbyScreenState
   }
 
   Widget participantList(BuildContext context) {
-    var participants = getTournamentParticipants(context, "");
     return FutureBuilder(
       future: participants,
       builder: (context, snapshot) {
@@ -96,17 +129,18 @@ class TournamentLobbyScreenState
           );
         } else {
           return ListView.builder(
-              shrinkWrap: true,
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                return participantCard(snapshot.data![index]);
-              });
+            shrinkWrap: true,
+            itemCount: snapshot.data!.length,
+            itemBuilder: (context, index) {
+              return participantCard(snapshot.data![index]);
+            },
+          );
         }
       },
     );
   }
 
-  Widget participantCard(TournamentParticipant participant) {
+  Widget participantCard(User participant) {
     return Center(
       child: Container(
         width: 400,
@@ -119,30 +153,11 @@ class TournamentLobbyScreenState
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Text(participant.userName!),
+            Text(participant.name!),
             Text("Rating: " + participant.rating!),
           ],
         ),
       ),
     );
-  }
-}
-
-class TournamentParticipant {
-  // Image profilePicture;
-  String? id;
-  String? userName;
-  String? rating;
-
-  TournamentParticipant({
-    required this.id,
-    required this.userName,
-    required this.rating,
-  });
-
-  TournamentParticipant.fromJSON(Map<String, dynamic> snapshot, String id) {
-    id = id;
-    userName = snapshot["userName"];
-    rating = snapshot["rating"];
   }
 }

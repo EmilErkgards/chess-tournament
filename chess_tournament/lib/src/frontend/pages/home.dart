@@ -4,6 +4,8 @@ import 'package:chess_tournament/src/frontend/common/base_input_field.dart';
 import 'package:chess_tournament/src/frontend/pages/tournament_lobby.dart';
 import 'package:flutter/material.dart';
 
+import '../../backend/backend_file.dart';
+
 class HomeScreen extends BasePageScreen {
   const HomeScreen({super.key});
 
@@ -69,28 +71,34 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
     );
   }
 
-  void _onCreate() {
-    //TODO: GetCode from backend
-    const code = "133769";
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => const TournamentLobbyScreen(
-              tournamentCode: code,
-              isLeader: true,
-              isStarted: false,
-            )));
+  void _onCreate() async {
+    //TODO: Get name from cookies
+    var owner = await getUserByName("Emil");
+    String code = await addTournament(owner!);
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => TournamentLobbyScreen(
+          tournamentCode: code,
+          isOwner: true,
+          isStarted: false,
+        ),
+      ),
+    );
   }
 
   void _onJoin() {
     _join(tournamentCodeController.text);
   }
 
-  void _join(String value) {
-    if (formKey.currentState!.validate()) {
+  void _join(String value) async {
+    var owner = await getUserByName("Anton");
+    if (formKey.currentState!.validate() &&
+        await addUserToTournament(owner!, value)) {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => TournamentLobbyScreen(
             tournamentCode: value,
-            isLeader: false,
+            isOwner: false,
             isStarted: true,
           ),
         ),
