@@ -153,7 +153,10 @@ class TournamentLobbyScreenState
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Image.network(participant.avatarUrl!),
+            SizedBox(
+              width: 100,
+              child: getAvatarFromUrl(participant.avatarUrl!),
+            ),
             Text(participant.name!),
             Text("Rating: " + participant.rating!),
           ],

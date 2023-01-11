@@ -4,7 +4,9 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 import 'package:http/http.dart' as http;
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ChessUser {
   String? docId;
@@ -231,5 +233,13 @@ Future<ChessUser> createChessUser(String userName) async {
     }
   } else {
     throw jsonDecode(jsonProfile.body);
+  }
+}
+
+Widget getAvatarFromUrl(String url) {
+  if (url.endsWith(".svg")) {
+    return SvgPicture.network(url);
+  } else {
+    return Image.network(url);
   }
 }
