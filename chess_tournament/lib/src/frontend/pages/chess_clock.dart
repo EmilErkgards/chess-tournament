@@ -31,9 +31,7 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
   @override
   void initState() {
     whitesTimeInMilliSeconds = 5 * 60 * 1000;
-    whitesTimeInMilliSeconds = 10;
     blacksTimeInMilliSeconds = 5 * 60 * 1000;
-    blacksTimeInMilliSeconds = 10;
     whitesTime = clockFormat.format(DateTime.fromMillisecondsSinceEpoch(
       whitesTimeInMilliSeconds.toInt(),
     ));

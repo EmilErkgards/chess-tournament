@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:chess_tournament/src/backend/backend_file.dart';
 import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:chess_tournament/src/frontend/common/base_button.dart';
 import 'package:chess_tournament/src/frontend/pages/tournament_overview.dart';
@@ -5,13 +8,13 @@ import 'package:flutter/material.dart';
 
 class TournamentLobbyScreen extends BasePageScreen {
   final String tournamentCode;
-  final bool isLeader;
-  final bool isStarted;
+  final bool isOwner;
+  bool isStarted = false;
 
-  const TournamentLobbyScreen({
+  TournamentLobbyScreen({
     super.key,
     required this.tournamentCode,
-    required this.isLeader,
+    required this.isOwner,
     required this.isStarted,
   });
 
@@ -21,9 +24,20 @@ class TournamentLobbyScreen extends BasePageScreen {
 
 class TournamentLobbyScreenState
     extends BasePageScreenState<TournamentLobbyScreen> with BaseScreen {
+  Future<List<ChessUser>>? participants;
+  Timer? fetchTimer;
+
   @override
   void initState() {
     super.initState();
+    participants = getTournamentParticipants(context, widget.tournamentCode);
+    setUpTimedFetch();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    fetchTimer?.cancel();
   }
 
   @override
@@ -31,26 +45,40 @@ class TournamentLobbyScreenState
     return "Tournament Lobby";
   }
 
-  void startTournament() {
+  //TODO: this probably wastes a lot of battery. Find a way to subscribe
+  //to changes instead
+  setUpTimedFetch() {
+    fetchTimer = Timer.periodic(
+      const Duration(milliseconds: 5000),
+      (timer) {
+        setState(
+          () {
+            participants =
+                getTournamentParticipants(context, widget.tournamentCode);
+          },
+        );
+      },
+    );
+  }
+
+  void startTournament() async {
     //TODO start tournament
     Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => TournamentOverviewScreen()));
+      MaterialPageRoute(
+        builder: (context) => const TournamentOverviewScreen(),
+      ),
+    );
   }
 
   void goToTournament() {
     Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => TournamentOverviewScreen()));
+      MaterialPageRoute(
+        builder: (context) => const TournamentOverviewScreen(),
+      ),
+    );
   }
 
   void openTournamentSettings() {}
-
-  late List<TournamentParticipant> participants = [
-    TournamentParticipant("Emil", 1215),
-    TournamentParticipant("Anton", 1500),
-    TournamentParticipant("Oskar", 420),
-    TournamentParticipant("Joel", 69),
-    TournamentParticipant("Anton", 1337),
-  ];
 
   @override
   Widget body() {
@@ -72,7 +100,7 @@ class TournamentLobbyScreenState
               callback: goToTournament,
               text: "Go To Tournament",
             ),
-          } else if (widget.isLeader) ...{
+          } else if (widget.isOwner) ...{
             BaseButton(
               callback: startTournament,
               text: "Start",
@@ -84,51 +112,56 @@ class TournamentLobbyScreenState
           },
           Expanded(
             flex: 10,
-            child: participantList(),
-          )
+            child: participantList(context),
+          ),
         ],
       ),
     );
   }
 
-  Widget participantList() {
-    return ListView(
-      shrinkWrap: true,
-      children: participants.map((participant) {
-        return Center(
-          child: Container(
-            width: 400,
-            height: 100,
-            margin: const EdgeInsets.all(5),
-            padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: Colors.brown,
-            ),
-            child: Center(
-              child: participantCard(participant),
-            ),
-          ),
-        );
-      }).toList(),
+  Widget participantList(BuildContext context) {
+    return FutureBuilder(
+      future: participants,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else {
+          return ListView.builder(
+            shrinkWrap: true,
+            itemCount: snapshot.data!.length,
+            itemBuilder: (context, index) {
+              return participantCard(snapshot.data![index]);
+            },
+          );
+        }
+      },
     );
   }
 
-  Widget participantCard(TournamentParticipant participant) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Text(participant.userName),
-        Text("Rating: " + participant.rating.toString()),
-      ],
+  Widget participantCard(ChessUser participant) {
+    return Center(
+      child: Container(
+        width: 400,
+        height: 30,
+        margin: const EdgeInsets.all(2),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          color: Colors.brown,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            SizedBox(
+              width: 100,
+              child: getAvatarFromUrl(participant.avatarUrl!),
+            ),
+            Text(participant.name!),
+            Text("Rating: " + participant.rating!),
+          ],
+        ),
+      ),
     );
   }
-}
-
-class TournamentParticipant {
-  late Image profilePicture;
-  late String userName;
-  late int rating;
-
-  TournamentParticipant(this.userName, this.rating);
 }

@@ -5,7 +5,9 @@ class BaseInputField extends StatefulWidget {
   final bool numbersOnly;
   final String placeholderText;
   final Function(String) validatorCallback;
-  final TextEditingController textFieldController;
+  final TextEditingController? textFieldController;
+  final bool valueVisible;
+  final Function(String)? callbackOnSubmitted;
 
   const BaseInputField({
     super.key,
@@ -13,6 +15,8 @@ class BaseInputField extends StatefulWidget {
     required this.placeholderText,
     required this.validatorCallback,
     required this.textFieldController,
+    this.valueVisible = true,
+    this.callbackOnSubmitted,
   });
 
   @override
@@ -30,6 +34,7 @@ class _BaseInputFieldState extends State<BaseInputField> {
         width: 300,
         height: height,
         child: TextFormField(
+          obscureText: !widget.valueVisible,
           inputFormatters: [
             if (widget.numbersOnly) ...{
               FilteringTextInputFormatter.digitsOnly,
@@ -38,10 +43,11 @@ class _BaseInputFieldState extends State<BaseInputField> {
           keyboardType: TextInputType.number,
           validator: validator,
           textAlign: TextAlign.center,
+          onFieldSubmitted: widget.callbackOnSubmitted,
           controller: widget.textFieldController,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            hintText: 'Enter tournament code ...',
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            hintText: widget.placeholderText,
           ),
         ),
       ),

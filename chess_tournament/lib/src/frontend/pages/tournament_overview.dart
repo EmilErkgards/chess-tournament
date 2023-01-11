@@ -4,6 +4,8 @@ import 'package:chess_tournament/src/frontend/pages/chess_clock.dart';
 import 'package:chess_tournament/src/frontend/pages/tournament_lobby.dart';
 import 'package:flutter/material.dart';
 
+import '../../backend/backend_file.dart';
+
 class TournamentOverviewScreen extends BasePageScreen {
   const TournamentOverviewScreen({super.key});
 
@@ -44,25 +46,25 @@ class _TournamentOverviewScreenState
     );
   }
 
-  late List<TournamentParticipant> participants = [
-    TournamentParticipant("Emil", 1215),
-    TournamentParticipant("Anton", 1500),
-    TournamentParticipant("Oskar", 420),
-    TournamentParticipant("Joel", 69),
-    TournamentParticipant("Anton", 1337),
+  late List<ChessUser> participants = [
+    ChessUser(name: "Emil", rating: "1215", uuid: "bla"),
+    ChessUser(name: "Anton", rating: "1500", uuid: "bla"),
+    ChessUser(name: "Oskar", rating: "420", uuid: "bla"),
+    ChessUser(name: "Joel", rating: "69", uuid: "bla"),
+    ChessUser(name: "Anton", rating: "1337", uuid: "bla"),
   ];
 
-  late List<TournamentParticipant> topThree = [
+  late List<ChessUser> topThree = [
     participants[0],
     participants[3],
     participants[4],
   ];
 
   late List<ChessMatch> matches = [
-    ChessMatch(participants[0], participants[1]),
-    ChessMatch(participants[1], participants[2]),
-    ChessMatch(participants[2], participants[3]),
-    ChessMatch(participants[3], participants[4]),
+    ChessMatch(docId: '', white: participants[0], black: participants[1]),
+    ChessMatch(docId: '', white: participants[2], black: participants[3]),
+    ChessMatch(docId: '', white: participants[4], black: participants[2]),
+    ChessMatch(docId: '', white: participants[3], black: participants[1]),
   ];
 
   Widget minimizedLeaderBoard() {
@@ -87,11 +89,11 @@ class _TournamentOverviewScreenState
     );
   }
 
-  Widget leaderBoardCard(TournamentParticipant participant) {
+  Widget leaderBoardCard(ChessUser participant) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        Text(participant.userName),
+        Text(participant.name!),
         Text("W: 5, L: 2, D: 4"),
       ],
     );
@@ -129,8 +131,8 @@ class _TournamentOverviewScreenState
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Text(match.white.userName),
-              Text("Rating: " + match.white.rating.toString()),
+              Text(match.white!.name!),
+              Text("Rating: " + match.white!.rating.toString()),
             ],
           ),
         ),
@@ -152,8 +154,8 @@ class _TournamentOverviewScreenState
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Text(match.black.userName),
-              Text("Rating: " + match.black.rating.toString()),
+              Text(match.black!.name!),
+              Text("Rating: " + match.black!.rating.toString()),
             ],
           ),
         ),
@@ -165,11 +167,4 @@ class _TournamentOverviewScreenState
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (context) => ChessClockScreen()));
   }
-}
-
-class ChessMatch {
-  TournamentParticipant white;
-  TournamentParticipant black;
-
-  ChessMatch(this.white, this.black);
 }

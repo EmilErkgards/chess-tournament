@@ -2,7 +2,10 @@ import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:chess_tournament/src/frontend/common/base_button.dart';
 import 'package:chess_tournament/src/frontend/common/base_input_field.dart';
 import 'package:chess_tournament/src/frontend/pages/tournament_lobby.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
+import '../../backend/backend_file.dart';
 
 class HomeScreen extends BasePageScreen {
   const HomeScreen({super.key});
@@ -30,8 +33,16 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
   @override
   Widget body() {
     return Center(
+      // child: Container(
+      //   decoration: BoxDecoration(
+      //     borderRadius: BorderRadius.circular(20),
+      //     color: Colors.black,
+      //   ),
+      //   child: Padding(
+      //     padding: const EdgeInsets.all(8.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Form(
             key: formKey,
@@ -44,7 +55,7 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
                     if (value.length == 6) {
                       return null;
                     }
-                    //TODO: Check backend
+                    //TODO
                     return 'Please enter a 6 digit code!';
                   }),
                   textFieldController: tournamentCodeController,
@@ -66,31 +77,41 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
           BaseButton(callback: _onCreate, text: "Create")
         ],
       ),
+      //   ),
+      // ),
     );
   }
 
-  void _onCreate() {
-    //TODO: GetCode from backend
-    const code = "133769";
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => const TournamentLobbyScreen(
-              tournamentCode: code,
-              isLeader: true,
-              isStarted: false,
-            )));
+  void _onCreate() async {
+    //TODO: Get name from cookies
+    var owner = await getUserByName("Emil");
+    String code = await addTournament(owner!);
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => TournamentLobbyScreen(
+          tournamentCode: code,
+          isOwner: true,
+          isStarted: false,
+        ),
+      ),
+    );
   }
 
   void _onJoin() {
     _join(tournamentCodeController.text);
   }
 
-  void _join(String value) {
-    if (formKey.currentState!.validate()) {
+  void _join(String value) async {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) throw "Not logged in";
+
+    if (formKey.currentState!.validate() &&
+        await addUserToTournament(currentUser, value)) {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => TournamentLobbyScreen(
             tournamentCode: value,
-            isLeader: false,
+            isOwner: false,
             isStarted: true,
           ),
         ),
