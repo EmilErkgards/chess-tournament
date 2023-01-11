@@ -52,7 +52,7 @@ class _LoginScreenState extends BasePageScreenState<LoginScreen>
                     textFieldController: passwordController,
                     validatorCallback: (String) {},
                     valueVisible: false,
-                    callbackOnChanged: tryLoginCallback,
+                    callbackOnSubmitted: tryLoginCallback,
                   ),
                   BaseButton(text: 'Login', callback: tryLogin)
                 ],

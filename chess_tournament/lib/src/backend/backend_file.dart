@@ -7,36 +7,41 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class DetailedUser {
-  // Image profilePicture;
-  String? id;
+  String? docId;
+  String? uuid;
   String? name;
   String? rating;
   String? tournamentCode;
+  String? avatarUrl;
 
   DetailedUser({
-    required this.id,
+    this.docId,
+    this.uuid,
     required this.name,
-    required this.rating,
-    required this.tournamentCode,
+    this.rating,
+    this.tournamentCode,
+    this.avatarUrl,
   });
 
-  DetailedUser.fromJSON(Map<String, dynamic> snapshot, String docId) {
-    id = docId;
+  DetailedUser.fromJSON(Map<String, dynamic> snapshot, String dId) {
+    docId = dId;
+    uuid = snapshot["uuid"];
     name = snapshot["name"];
     rating = snapshot["rating"];
     tournamentCode = snapshot["tournamentCode"];
+    avatarUrl = snapshot["avatarUrl"];
   }
 }
 
 class Tournament {
-  String? id;
+  String? docId;
   String? code;
   String? state;
   String? format;
   DetailedUser? owner;
 
   Tournament({
-    required this.id,
+    required this.docId,
     required this.code,
     required this.state,
     required this.format,
@@ -50,17 +55,17 @@ class Tournament {
     var format = snapshot["format"];
     var owner = await getUserById(snapshot["black"]);
     return Tournament(
-        id: docId, code: code, state: state, format: format, owner: owner);
+        docId: docId, code: code, state: state, format: format, owner: owner);
   }
 }
 
 class ChessMatch {
-  String? id;
+  String? docId;
   DetailedUser? white;
   DetailedUser? black;
 
   ChessMatch({
-    required this.id,
+    required this.docId,
     required this.white,
     required this.black,
   });
@@ -68,7 +73,7 @@ class ChessMatch {
   Future<ChessMatch> fromJSON(Map<String, dynamic> snapshot, String id) async {
     var white = await getUserById(snapshot["white"]);
     var black = await getUserById(snapshot["black"]);
-    return ChessMatch(id: id, white: white, black: black);
+    return ChessMatch(docId: id, white: white, black: black);
   }
 }
 
@@ -77,6 +82,7 @@ Future<List<DetailedUser>> getTournamentParticipants(
   List<DetailedUser> participants = List.empty(growable: true);
   var firebaseResponse =
       await FirebaseFirestore.instance.collection('users').get();
+
   firebaseResponse.docs.forEach(
       (doc) => participants.add(DetailedUser.fromJSON(doc.data(), doc.id)));
   participants
@@ -84,13 +90,14 @@ Future<List<DetailedUser>> getTournamentParticipants(
   return participants;
 }
 
-void addUserToDB(DetailedUser user) async {
-  var firebaseResponse =
-      await FirebaseFirestore.instance.collection('users').add({
-    "userId": user.id,
+Future<DocumentReference<Map<String, dynamic>>> addUserToDB(
+    DetailedUser user) async {
+  return await FirebaseFirestore.instance.collection('users').add({
+    "userId": user.uuid,
     "name": user.name,
     "rating": user.rating,
     "tournamentCode": user.tournamentCode,
+    "avatarUrl": user.avatarUrl
   });
 }
 
@@ -124,6 +131,21 @@ Future<DetailedUser?> getUserByName(String name) async {
   return returnVal;
 }
 
+Future<DetailedUser?> getChessUserByUUID(String uuid) async {
+  //TODO Maybe filter this serverside
+  DetailedUser? returnVal;
+  var firebaseResponse =
+      await FirebaseFirestore.instance.collection('users').get();
+  firebaseResponse.docs.forEach(
+    (doc) {
+      if (doc.data()["userId"] == uuid) {
+        returnVal = DetailedUser.fromJSON(doc.data(), doc.id);
+      }
+    },
+  );
+  return returnVal;
+}
+
 int generateCode() {
   return Random().nextInt(899999) + 100000;
 }
@@ -138,7 +160,7 @@ Future<String> addTournament(DetailedUser owner) async {
     "code": code,
     "state": "notStarted",
     "format": "roundRobin",
-    "owner": owner.id
+    "owner": owner.uuid
   });
 
   return code.toString();
@@ -165,10 +187,16 @@ Future<bool> addUserToTournament(User user, String code) async {
     return false;
   }
 
-  FirebaseFirestore.instance
-      .collection('users')
-      .doc(user.uid)
-      .update({"tournamentCode": code});
+  var dUser = await getChessUserByUUID(user.uid);
+  if (dUser == null) throw "Could not find chess user with uuid: " + user.uid;
+  try {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(dUser.docId)
+        .update({"tournamentCode": code});
+  } catch (error) {
+    rethrow;
+  }
   return true;
 }
 
@@ -176,22 +204,32 @@ Future<http.Response> fetchFromApi(String url) {
   return http.get(Uri.parse(url));
 }
 
-Future<DetailedUser> getChessUser(String userName) async {
-  var jsonResponse =
-      await fetchFromApi("https://api.chess.com/pub/player/$userName/stats");
-  if (jsonResponse.statusCode == 200) {
-    try {
-      var json = jsonDecode(jsonResponse.body);
-      DetailedUser user = DetailedUser(
-        id: "",
-        name: userName,
-        rating: json["chess_rapid"]["last"]["rating"].toString(),
-        tournamentCode: "",
-      );
-      return user;
-    } catch (error) {
-      throw error;
+Future<DetailedUser> createChessUser(String userName) async {
+  var jsonProfile =
+      await fetchFromApi("https://api.chess.com/pub/player/$userName");
+  if (jsonProfile.statusCode == 200) {
+    var jsonStats =
+        await fetchFromApi("https://api.chess.com/pub/player/$userName/stats");
+    if (jsonStats.statusCode == 200) {
+      try {
+        var jsonS = jsonDecode(jsonStats.body);
+        var jsonP = jsonDecode(jsonProfile.body);
+        var avatarUrl = jsonP["avatar"];
+        avatarUrl ??=
+            "https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/Inexperienced42/phpRwn5UJ.png";
+
+        DetailedUser user = DetailedUser(
+            name: userName,
+            rating: jsonS["chess_rapid"]["last"]["rating"].toString(),
+            avatarUrl: avatarUrl);
+        return user;
+      } catch (error) {
+        rethrow;
+      }
+    } else {
+      throw jsonDecode(jsonStats.body);
     }
+  } else {
+    throw jsonDecode(jsonProfile.body);
   }
-  throw jsonDecode(jsonResponse.body);
 }

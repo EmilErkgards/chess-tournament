@@ -103,9 +103,10 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
 
   void _join(String value) async {
     User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) throw "Not logged in";
 
     if (formKey.currentState!.validate() &&
-        await addUserToTournament(currentUser!, value)) {
+        await addUserToTournament(currentUser, value)) {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => TournamentLobbyScreen(

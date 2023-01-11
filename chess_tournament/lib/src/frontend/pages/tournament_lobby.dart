@@ -9,9 +9,9 @@ import 'package:flutter/material.dart';
 class TournamentLobbyScreen extends BasePageScreen {
   final String tournamentCode;
   final bool isOwner;
-  final bool isStarted;
+  bool isStarted = false;
 
-  const TournamentLobbyScreen({
+  TournamentLobbyScreen({
     super.key,
     required this.tournamentCode,
     required this.isOwner,
@@ -153,6 +153,7 @@ class TournamentLobbyScreenState
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
+            Image.network(participant.avatarUrl!),
             Text(participant.name!),
             Text("Rating: " + participant.rating!),
           ],

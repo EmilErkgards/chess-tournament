@@ -47,16 +47,11 @@ class _TournamentOverviewScreenState
   }
 
   late List<DetailedUser> participants = [
-    DetailedUser(
-        name: "Emil", rating: "1215", id: "bla", tournamentCode: "142142"),
-    DetailedUser(
-        name: "Anton", rating: "1500", id: "bla", tournamentCode: "142142"),
-    DetailedUser(
-        name: "Oskar", rating: "420", id: "bla", tournamentCode: "142142"),
-    DetailedUser(
-        name: "Joel", rating: "69", id: "bla", tournamentCode: "142142"),
-    DetailedUser(
-        name: "Anton", rating: "1337", id: "bla", tournamentCode: "142142"),
+    DetailedUser(name: "Emil", rating: "1215", uuid: "bla"),
+    DetailedUser(name: "Anton", rating: "1500", uuid: "bla"),
+    DetailedUser(name: "Oskar", rating: "420", uuid: "bla"),
+    DetailedUser(name: "Joel", rating: "69", uuid: "bla"),
+    DetailedUser(name: "Anton", rating: "1337", uuid: "bla"),
   ];
 
   late List<DetailedUser> topThree = [
@@ -66,10 +61,10 @@ class _TournamentOverviewScreenState
   ];
 
   late List<ChessMatch> matches = [
-    ChessMatch(id: '', white: participants[0], black: participants[1]),
-    ChessMatch(id: '', white: participants[2], black: participants[3]),
-    ChessMatch(id: '', white: participants[4], black: participants[2]),
-    ChessMatch(id: '', white: participants[3], black: participants[1]),
+    ChessMatch(docId: '', white: participants[0], black: participants[1]),
+    ChessMatch(docId: '', white: participants[2], black: participants[3]),
+    ChessMatch(docId: '', white: participants[4], black: participants[2]),
+    ChessMatch(docId: '', white: participants[3], black: participants[1]),
   ];
 
   Widget minimizedLeaderBoard() {

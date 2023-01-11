@@ -7,7 +7,7 @@ class BaseInputField extends StatefulWidget {
   final Function(String) validatorCallback;
   final TextEditingController? textFieldController;
   final bool valueVisible;
-  final Function(String)? callbackOnChanged;
+  final Function(String)? callbackOnSubmitted;
 
   const BaseInputField({
     super.key,
@@ -16,7 +16,7 @@ class BaseInputField extends StatefulWidget {
     required this.validatorCallback,
     required this.textFieldController,
     this.valueVisible = true,
-    this.callbackOnChanged = null,
+    this.callbackOnSubmitted,
   });
 
   @override
@@ -43,7 +43,7 @@ class _BaseInputFieldState extends State<BaseInputField> {
           keyboardType: TextInputType.number,
           validator: validator,
           textAlign: TextAlign.center,
-          onChanged: widget.callbackOnChanged,
+          onFieldSubmitted: widget.callbackOnSubmitted,
           controller: widget.textFieldController,
           decoration: InputDecoration(
             border: const OutlineInputBorder(),
