@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class DetailedUser {
+class ChessUser {
   String? docId;
   String? uuid;
   String? name;
@@ -14,7 +14,7 @@ class DetailedUser {
   String? tournamentCode;
   String? avatarUrl;
 
-  DetailedUser({
+  ChessUser({
     this.docId,
     this.uuid,
     required this.name,
@@ -23,7 +23,7 @@ class DetailedUser {
     this.avatarUrl,
   });
 
-  DetailedUser.fromJSON(Map<String, dynamic> snapshot, String dId) {
+  ChessUser.fromJSON(Map<String, dynamic> snapshot, String dId) {
     docId = dId;
     uuid = snapshot["uuid"];
     name = snapshot["name"];
@@ -38,7 +38,7 @@ class Tournament {
   String? code;
   String? state;
   String? format;
-  DetailedUser? owner;
+  ChessUser? owner;
 
   Tournament({
     required this.docId,
@@ -61,8 +61,8 @@ class Tournament {
 
 class ChessMatch {
   String? docId;
-  DetailedUser? white;
-  DetailedUser? black;
+  ChessUser? white;
+  ChessUser? black;
 
   ChessMatch({
     required this.docId,
@@ -77,21 +77,21 @@ class ChessMatch {
   }
 }
 
-Future<List<DetailedUser>> getTournamentParticipants(
+Future<List<ChessUser>> getTournamentParticipants(
     BuildContext context, String tournamentCode) async {
-  List<DetailedUser> participants = List.empty(growable: true);
+  List<ChessUser> participants = List.empty(growable: true);
   var firebaseResponse =
       await FirebaseFirestore.instance.collection('users').get();
 
   firebaseResponse.docs.forEach(
-      (doc) => participants.add(DetailedUser.fromJSON(doc.data(), doc.id)));
+      (doc) => participants.add(ChessUser.fromJSON(doc.data(), doc.id)));
   participants
       .removeWhere((element) => element.tournamentCode != tournamentCode);
   return participants;
 }
 
 Future<DocumentReference<Map<String, dynamic>>> addUserToDB(
-    DetailedUser user) async {
+    ChessUser user) async {
   return await FirebaseFirestore.instance.collection('users').add({
     "userId": user.uuid,
     "name": user.name,
@@ -101,45 +101,45 @@ Future<DocumentReference<Map<String, dynamic>>> addUserToDB(
   });
 }
 
-Future<DetailedUser?> getUserById(String id) async {
+Future<ChessUser?> getUserById(String id) async {
   //TODO Maybe filter this serverside
-  DetailedUser? returnVal;
+  ChessUser? returnVal;
   var firebaseResponse =
       await FirebaseFirestore.instance.collection('users').get();
   firebaseResponse.docs.forEach(
     (doc) {
       if (doc.data()["id"] == id) {
-        returnVal = DetailedUser.fromJSON(doc.data(), id);
+        returnVal = ChessUser.fromJSON(doc.data(), id);
       }
     },
   );
   return returnVal;
 }
 
-Future<DetailedUser?> getUserByName(String name) async {
+Future<ChessUser?> getUserByName(String name) async {
   //TODO Maybe filter this serverside
-  DetailedUser? returnVal;
+  ChessUser? returnVal;
   var firebaseResponse =
       await FirebaseFirestore.instance.collection('users').get();
   firebaseResponse.docs.forEach(
     (doc) {
       if (doc.data()["name"] == name) {
-        returnVal = DetailedUser.fromJSON(doc.data(), doc.id);
+        returnVal = ChessUser.fromJSON(doc.data(), doc.id);
       }
     },
   );
   return returnVal;
 }
 
-Future<DetailedUser?> getChessUserByUUID(String uuid) async {
+Future<ChessUser?> getChessUserByUUID(String uuid) async {
   //TODO Maybe filter this serverside
-  DetailedUser? returnVal;
+  ChessUser? returnVal;
   var firebaseResponse =
       await FirebaseFirestore.instance.collection('users').get();
   firebaseResponse.docs.forEach(
     (doc) {
       if (doc.data()["userId"] == uuid) {
-        returnVal = DetailedUser.fromJSON(doc.data(), doc.id);
+        returnVal = ChessUser.fromJSON(doc.data(), doc.id);
       }
     },
   );
@@ -150,7 +150,7 @@ int generateCode() {
   return Random().nextInt(899999) + 100000;
 }
 
-Future<String> addTournament(DetailedUser owner) async {
+Future<String> addTournament(ChessUser owner) async {
   int code = generateCode();
   while ((await codeExistsInDB(code.toString()))) {
     code = generateCode();
@@ -204,7 +204,7 @@ Future<http.Response> fetchFromApi(String url) {
   return http.get(Uri.parse(url));
 }
 
-Future<DetailedUser> createChessUser(String userName) async {
+Future<ChessUser> createChessUser(String userName) async {
   var jsonProfile =
       await fetchFromApi("https://api.chess.com/pub/player/$userName");
   if (jsonProfile.statusCode == 200) {
@@ -218,7 +218,7 @@ Future<DetailedUser> createChessUser(String userName) async {
         avatarUrl ??=
             "https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/Inexperienced42/phpRwn5UJ.png";
 
-        DetailedUser user = DetailedUser(
+        ChessUser user = ChessUser(
             name: userName,
             rating: jsonS["chess_rapid"]["last"]["rating"].toString(),
             avatarUrl: avatarUrl);

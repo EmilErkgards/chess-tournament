@@ -114,7 +114,7 @@ class _RegistrationScreenState extends BasePageScreenState<RegistrationScreen>
       showSpinner = true;
     });
     try {
-      DetailedUser user = await createChessUser(chessUsernameController.text);
+      ChessUser user = await createChessUser(chessUsernameController.text);
 
       final newUser = await _auth.createUserWithEmailAndPassword(
           email: emailController.text, password: passwordController.text);
