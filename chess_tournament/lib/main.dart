@@ -1,10 +1,11 @@
+import 'package:chess_tournament/src/backend/dark_theme.dart';
 import 'package:chess_tournament/src/frontend/pages/home.dart';
 import 'package:chess_tournament/src/frontend/pages/login.dart';
 import 'package:chess_tournament/src/frontend/pages/registration.dart';
 import 'package:chess_tournament/src/frontend/pages/welcome.dart';
-import 'package:chess_tournament/src/frontend/themes/themes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,18 +23,39 @@ void main() async {
 class MyApp extends StatelessWidget {
   MyApp({Key? key}) : super(key: key);
 
+  DarkThemeProvider themeChangeProvider = DarkThemeProvider();
+
+  void getCurrentAppTheme() async {
+    themeChangeProvider.darkTheme =
+        await themeChangeProvider.darkThemePreference.getTheme();
+  }
+
+  @override
+  void initState() {
+    getCurrentAppTheme();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Chess Tournament Planner',
-      theme: darkTheme,
-      initialRoute: 'welcome_screen',
-      routes: {
-        'welcome_screen': (context) => WelcomeScreen(),
-        'registration_screen': (context) => RegistrationScreen(),
-        'login_screen': (context) => LoginScreen(),
-        '/': (context) => HomeScreen()
+    return ChangeNotifierProvider(
+      create: (_) {
+        return themeChangeProvider;
       },
+      child: Consumer<DarkThemeProvider>(
+        builder: (BuildContext context, value, Widget? child) {
+          return MaterialApp(
+            title: 'Chess Tournament Planner',
+            initialRoute: 'welcome_screen',
+            theme: Styles.themeData(themeChangeProvider.darkTheme, context),
+            routes: {
+              'welcome_screen': (context) => WelcomeScreen(),
+              'registration_screen': (context) => RegistrationScreen(),
+              'login_screen': (context) => LoginScreen(),
+              '/': (context) => HomeScreen()
+            },
+          );
+        },
+      ),
     );
   }
 }

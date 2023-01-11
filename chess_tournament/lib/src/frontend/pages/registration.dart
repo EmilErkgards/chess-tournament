@@ -32,11 +32,7 @@ class _RegistrationScreenState extends BasePageScreenState<RegistrationScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: Colors.black,
-            ),
+          Card(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(

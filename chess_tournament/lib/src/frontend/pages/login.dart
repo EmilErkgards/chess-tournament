@@ -29,11 +29,7 @@ class _LoginScreenState extends BasePageScreenState<LoginScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: Colors.black,
-            ),
+          Card(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
@@ -66,11 +62,9 @@ class _LoginScreenState extends BasePageScreenState<LoginScreen>
                 children: [
                   const TextSpan(
                     text: 'Not a member? ',
-                    style: TextStyle(color: Colors.black),
                   ),
                   TextSpan(
                     text: 'Register here!',
-                    style: TextStyle(color: Colors.pink),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
                         Navigator.pushNamed(context, 'registration_screen');
