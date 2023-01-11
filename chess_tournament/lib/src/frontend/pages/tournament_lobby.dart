@@ -24,7 +24,7 @@ class TournamentLobbyScreen extends BasePageScreen {
 
 class TournamentLobbyScreenState
     extends BasePageScreenState<TournamentLobbyScreen> with BaseScreen {
-  Future<List<User>>? participants;
+  Future<List<DetailedUser>>? participants;
   Timer? fetchTimer;
 
   @override
@@ -140,7 +140,7 @@ class TournamentLobbyScreenState
     );
   }
 
-  Widget participantCard(User participant) {
+  Widget participantCard(DetailedUser participant) {
     return Center(
       child: Container(
         width: 400,

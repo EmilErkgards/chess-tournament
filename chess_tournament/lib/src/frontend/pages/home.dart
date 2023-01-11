@@ -2,6 +2,7 @@ import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:chess_tournament/src/frontend/common/base_button.dart';
 import 'package:chess_tournament/src/frontend/common/base_input_field.dart';
 import 'package:chess_tournament/src/frontend/pages/tournament_lobby.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../backend/backend_file.dart';
@@ -32,8 +33,16 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
   @override
   Widget body() {
     return Center(
+      // child: Container(
+      //   decoration: BoxDecoration(
+      //     borderRadius: BorderRadius.circular(20),
+      //     color: Colors.black,
+      //   ),
+      //   child: Padding(
+      //     padding: const EdgeInsets.all(8.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Form(
             key: formKey,
@@ -46,7 +55,7 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
                     if (value.length == 6) {
                       return null;
                     }
-                    //TODO: Check backend
+                    //TODO
                     return 'Please enter a 6 digit code!';
                   }),
                   textFieldController: tournamentCodeController,
@@ -68,6 +77,8 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
           BaseButton(callback: _onCreate, text: "Create")
         ],
       ),
+      //   ),
+      // ),
     );
   }
 
@@ -91,9 +102,10 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
   }
 
   void _join(String value) async {
-    var owner = await getUserByName("Anton");
+    User? currentUser = FirebaseAuth.instance.currentUser;
+
     if (formKey.currentState!.validate() &&
-        await addUserToTournament(owner!, value)) {
+        await addUserToTournament(currentUser!, value)) {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => TournamentLobbyScreen(

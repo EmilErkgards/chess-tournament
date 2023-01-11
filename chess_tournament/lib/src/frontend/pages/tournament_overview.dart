@@ -46,15 +46,20 @@ class _TournamentOverviewScreenState
     );
   }
 
-  late List<User> participants = [
-    User(name: "Emil", rating: "1215", id: "bla", tournamentCode: "142142"),
-    User(name: "Anton", rating: "1500", id: "bla", tournamentCode: "142142"),
-    User(name: "Oskar", rating: "420", id: "bla", tournamentCode: "142142"),
-    User(name: "Joel", rating: "69", id: "bla", tournamentCode: "142142"),
-    User(name: "Anton", rating: "1337", id: "bla", tournamentCode: "142142"),
+  late List<DetailedUser> participants = [
+    DetailedUser(
+        name: "Emil", rating: "1215", id: "bla", tournamentCode: "142142"),
+    DetailedUser(
+        name: "Anton", rating: "1500", id: "bla", tournamentCode: "142142"),
+    DetailedUser(
+        name: "Oskar", rating: "420", id: "bla", tournamentCode: "142142"),
+    DetailedUser(
+        name: "Joel", rating: "69", id: "bla", tournamentCode: "142142"),
+    DetailedUser(
+        name: "Anton", rating: "1337", id: "bla", tournamentCode: "142142"),
   ];
 
-  late List<User> topThree = [
+  late List<DetailedUser> topThree = [
     participants[0],
     participants[3],
     participants[4],
@@ -89,7 +94,7 @@ class _TournamentOverviewScreenState
     );
   }
 
-  Widget leaderBoardCard(User participant) {
+  Widget leaderBoardCard(DetailedUser participant) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [

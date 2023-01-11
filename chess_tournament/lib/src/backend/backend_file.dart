@@ -1,23 +1,26 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
-class User {
+class DetailedUser {
   // Image profilePicture;
   String? id;
   String? name;
   String? rating;
   String? tournamentCode;
 
-  User({
+  DetailedUser({
     required this.id,
     required this.name,
     required this.rating,
     required this.tournamentCode,
   });
 
-  User.fromJSON(Map<String, dynamic> snapshot, String docId) {
+  DetailedUser.fromJSON(Map<String, dynamic> snapshot, String docId) {
     id = docId;
     name = snapshot["name"];
     rating = snapshot["rating"];
@@ -30,7 +33,7 @@ class Tournament {
   String? code;
   String? state;
   String? format;
-  User? owner;
+  DetailedUser? owner;
 
   Tournament({
     required this.id,
@@ -53,8 +56,8 @@ class Tournament {
 
 class ChessMatch {
   String? id;
-  User? white;
-  User? black;
+  DetailedUser? white;
+  DetailedUser? black;
 
   ChessMatch({
     required this.id,
@@ -69,52 +72,66 @@ class ChessMatch {
   }
 }
 
-Future<List<User>> getTournamentParticipants(
+Future<List<DetailedUser>> getTournamentParticipants(
     BuildContext context, String tournamentCode) async {
-  List<User> participants = List.empty(growable: true);
+  List<DetailedUser> participants = List.empty(growable: true);
   var firebaseResponse =
       await FirebaseFirestore.instance.collection('users').get();
-  firebaseResponse.docs
-      .forEach((doc) => participants.add(User.fromJSON(doc.data(), doc.id)));
+  firebaseResponse.docs.forEach(
+      (doc) => participants.add(DetailedUser.fromJSON(doc.data(), doc.id)));
   participants
       .removeWhere((element) => element.tournamentCode != tournamentCode);
   return participants;
 }
 
-Future<User?> getUserById(String id) async {
+void addUserToDB(DetailedUser user) async {
+  var firebaseResponse =
+      await FirebaseFirestore.instance.collection('users').add({
+    "userId": user.id,
+    "name": user.name,
+    "rating": user.rating,
+    "tournamentCode": user.tournamentCode,
+  });
+}
+
+Future<DetailedUser?> getUserById(String id) async {
   //TODO Maybe filter this serverside
-  User? returnVal;
+  DetailedUser? returnVal;
   var firebaseResponse =
       await FirebaseFirestore.instance.collection('users').get();
   firebaseResponse.docs.forEach(
     (doc) {
       if (doc.data()["id"] == id) {
-        returnVal = User.fromJSON(doc.data(), id);
+        returnVal = DetailedUser.fromJSON(doc.data(), id);
       }
     },
   );
   return returnVal;
 }
 
-Future<User?> getUserByName(String name) async {
+Future<DetailedUser?> getUserByName(String name) async {
   //TODO Maybe filter this serverside
-  User? returnVal;
+  DetailedUser? returnVal;
   var firebaseResponse =
       await FirebaseFirestore.instance.collection('users').get();
   firebaseResponse.docs.forEach(
     (doc) {
       if (doc.data()["name"] == name) {
-        returnVal = User.fromJSON(doc.data(), doc.id);
+        returnVal = DetailedUser.fromJSON(doc.data(), doc.id);
       }
     },
   );
   return returnVal;
 }
 
-Future<String> addTournament(User owner) async {
-  int code = Random().nextInt(899999) + 100000;
+int generateCode() {
+  return Random().nextInt(899999) + 100000;
+}
+
+Future<String> addTournament(DetailedUser owner) async {
+  int code = generateCode();
   while ((await codeExistsInDB(code.toString()))) {
-    code = Random().nextInt(899999) + 100000;
+    code = generateCode();
   }
 
   FirebaseFirestore.instance.collection('tournaments').add({
@@ -150,7 +167,31 @@ Future<bool> addUserToTournament(User user, String code) async {
 
   FirebaseFirestore.instance
       .collection('users')
-      .doc(user.id)
+      .doc(user.uid)
       .update({"tournamentCode": code});
   return true;
+}
+
+Future<http.Response> fetchFromApi(String url) {
+  return http.get(Uri.parse(url));
+}
+
+Future<DetailedUser> getChessUser(String userName) async {
+  var jsonResponse =
+      await fetchFromApi("https://api.chess.com/pub/player/$userName/stats");
+  if (jsonResponse.statusCode == 200) {
+    try {
+      var json = jsonDecode(jsonResponse.body);
+      DetailedUser user = DetailedUser(
+        id: "",
+        name: userName,
+        rating: json["chess_rapid"]["last"]["rating"].toString(),
+        tournamentCode: "",
+      );
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+  throw jsonDecode(jsonResponse.body);
 }

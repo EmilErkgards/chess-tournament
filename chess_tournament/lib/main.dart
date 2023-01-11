@@ -1,4 +1,7 @@
 import 'package:chess_tournament/src/frontend/pages/home.dart';
+import 'package:chess_tournament/src/frontend/pages/login.dart';
+import 'package:chess_tournament/src/frontend/pages/registration.dart';
+import 'package:chess_tournament/src/frontend/pages/welcome.dart';
 import 'package:chess_tournament/src/frontend/themes/themes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +27,13 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Chess Tournament Planner',
       theme: darkTheme,
-      home: HomeScreen(),
+      initialRoute: 'welcome_screen',
+      routes: {
+        'welcome_screen': (context) => WelcomeScreen(),
+        'registration_screen': (context) => RegistrationScreen(),
+        'login_screen': (context) => LoginScreen(),
+        '/': (context) => HomeScreen()
+      },
     );
   }
 }
