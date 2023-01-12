@@ -2,7 +2,7 @@ import 'package:chess_tournament/src/backend/backend_file.dart';
 import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:chess_tournament/src/frontend/common/base_button.dart';
 import 'package:chess_tournament/src/frontend/common/base_input_field.dart';
-import 'package:flutter/gestures.dart';
+import 'package:chess_tournament/src/frontend/pages/login.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -67,7 +67,7 @@ class _RegistrationScreenState extends BasePageScreenState<RegistrationScreen>
                     placeholderText: 'Confirm Password',
                     textFieldController: confirmPasswordController,
                     validatorCallback: (string) {
-                      if (string == passwordController) {
+                      if (string == passwordController.text) {
                         return null;
                       }
                       return "Password doesn't match";
@@ -81,21 +81,21 @@ class _RegistrationScreenState extends BasePageScreenState<RegistrationScreen>
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: RichText(
-              text: TextSpan(
+            child: Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const TextSpan(
-                    text: 'Already a member? ',
-                    style: TextStyle(color: Colors.black),
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text("Already a member?"),
                   ),
-                  TextSpan(
-                    text: 'Login here!',
-                    style: TextStyle(color: Colors.pink),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        Navigator.pushNamed(context, 'login_screen');
-                      },
-                  ),
+                  ElevatedButton(
+                    onPressed: (() => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => LoginScreen()))),
+                    child: Text("Login here!"),
+                  )
                 ],
               ),
             ),

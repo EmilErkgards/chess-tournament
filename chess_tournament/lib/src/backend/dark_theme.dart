@@ -57,7 +57,6 @@ class Styles {
     return ThemeData(
       primarySwatch: MaterialColor(baseGreen.value, swatch),
       primaryColor: isDarkTheme ? swatch[600] : swatch[500],
-
       backgroundColor: isDarkTheme ? darkBG : lightBG,
       scaffoldBackgroundColor: isDarkTheme ? darkBG : lightBG,
       // indicatorColor: isDarkTheme ? Color(0xff0E1D36) : Color(0xffCBDCF8),
@@ -79,12 +78,10 @@ class Styles {
         color: isDarkTheme ? swatch[600] : swatch[500],
         elevation: 0.0,
       ),
-      textTheme: TextTheme(
-        headline1: TextStyle(color: Colors.deepPurpleAccent),
-        headline2: TextStyle(color: Color(0xffF02E65)),
-        bodyText1: TextStyle(color: Color(0xffF02E65)),
-        bodyText2: TextStyle(color: Color(0xffF02E65)),
-      ),
+      textTheme: Theme.of(context).textTheme.apply(
+            bodyColor: isDarkTheme ? Colors.grey : Colors.black,
+            displayColor: isDarkTheme ? Colors.grey : Colors.black,
+          ),
     );
   }
 }

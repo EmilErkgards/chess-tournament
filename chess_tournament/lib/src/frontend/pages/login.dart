@@ -1,7 +1,8 @@
 import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:chess_tournament/src/frontend/common/base_button.dart';
 import 'package:chess_tournament/src/frontend/common/base_input_field.dart';
-import 'package:flutter/gestures.dart';
+import 'package:chess_tournament/src/frontend/pages/home.dart';
+import 'package:chess_tournament/src/frontend/pages/registration.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -57,19 +58,21 @@ class _LoginScreenState extends BasePageScreenState<LoginScreen>
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: RichText(
-              text: TextSpan(
+            child: Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const TextSpan(
-                    text: 'Not a member? ',
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text("Not a member?"),
                   ),
-                  TextSpan(
-                    text: 'Register here!',
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        Navigator.pushNamed(context, 'registration_screen');
-                      },
-                  ),
+                  ElevatedButton(
+                    onPressed: (() => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => RegistrationScreen()))),
+                    child: Text("Register here!"),
+                  )
                 ],
               ),
             ),
@@ -91,7 +94,8 @@ class _LoginScreenState extends BasePageScreenState<LoginScreen>
       final user = await _auth.signInWithEmailAndPassword(
           email: emailController.text, password: passwordController.text);
       if (user != null) {
-        Navigator.pushNamed(context, '/');
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => HomeScreen()));
       }
     } catch (e) {
       print(e);

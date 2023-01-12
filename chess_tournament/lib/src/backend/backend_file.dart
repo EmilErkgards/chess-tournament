@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:jovial_svg/jovial_svg.dart';
 
 class ChessUser {
   String? docId;
@@ -218,7 +218,7 @@ Future<ChessUser> createChessUser(String userName) async {
         var jsonP = jsonDecode(jsonProfile.body);
         var avatarUrl = jsonP["avatar"];
         avatarUrl ??=
-            "https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/Inexperienced42/phpRwn5UJ.png";
+            "https://www.chess.com/bundles/web/images/user-image.007dad08.svg";
 
         ChessUser user = ChessUser(
             name: userName,
@@ -238,7 +238,8 @@ Future<ChessUser> createChessUser(String userName) async {
 
 Widget getAvatarFromUrl(String url) {
   if (url.endsWith(".svg")) {
-    return SvgPicture.network(url);
+    return ScalableImageWidget.fromSISource(
+        si: ScalableImageSource.fromSvgHttpUrl(Uri.parse(url)));
   } else {
     return Image.network(url);
   }
