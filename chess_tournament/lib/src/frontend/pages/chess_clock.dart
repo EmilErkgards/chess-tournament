@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:flutter/material.dart';
@@ -59,7 +58,7 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
   }
 
   @override
-  Widget body() {
+  Widget body(BuildContext context) {
     return Center(
       child: Stack(
         children: [

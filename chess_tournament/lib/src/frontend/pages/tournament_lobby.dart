@@ -81,40 +81,85 @@ class TournamentLobbyScreenState
   void openTournamentSettings() {}
 
   @override
-  Widget body() {
+  Widget body(BuildContext context) {
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            height: 100,
-            child: Text(
-              widget.tournamentCode,
-              style: const TextStyle(
-                fontSize: 60,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+              child: SizedBox(
+                width: 400,
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Column(
+                      children: [
+                        const Text(
+                          "Tournament Code",
+                          style: TextStyle(
+                            fontSize: 25,
+                          ),
+                        ),
+                        Text(
+                          widget.tournamentCode,
+                          style: const TextStyle(
+                            fontSize: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
-          ),
-          if (widget.isStarted) ...{
-            BaseButton(
-              callback: goToTournament,
-              text: "Go To Tournament",
+            const SizedBox(
+              width: 400,
+              child: Card(
+                child: Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Text(
+                    "Participants",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+              ),
             ),
-          } else if (widget.isOwner) ...{
-            BaseButton(
-              callback: startTournament,
-              text: "Start",
+            Expanded(
+              flex: 7,
+              child: participantList(context),
             ),
-            BaseButton(
-              callback: openTournamentSettings,
-              text: "Tournament Settings",
-            ),
-          },
-          Expanded(
-            flex: 10,
-            child: participantList(context),
-          ),
-        ],
+            if (widget.isStarted) ...{
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: BaseButton(
+                  callback: goToTournament,
+                  text: "Go To Tournament",
+                ),
+              ),
+            } else if (widget.isOwner) ...{
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: BaseButton(
+                  callback: startTournament,
+                  text: "Start",
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: BaseButton(
+                  callback: openTournamentSettings,
+                  text: "Tournament Settings",
+                ),
+              ),
+            },
+          ],
+        ),
       ),
     );
   }
@@ -128,12 +173,15 @@ class TournamentLobbyScreenState
             child: CircularProgressIndicator(),
           );
         } else {
-          return ListView.builder(
-            shrinkWrap: true,
-            itemCount: snapshot.data!.length,
-            itemBuilder: (context, index) {
-              return participantCard(snapshot.data![index]);
-            },
+          return SizedBox(
+            width: 400,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                return participantCard(snapshot.data![index]);
+              },
+            ),
           );
         }
       },
@@ -141,21 +189,18 @@ class TournamentLobbyScreenState
   }
 
   Widget participantCard(ChessUser participant) {
-    return Center(
-      child: Container(
-        width: 400,
-        height: 30,
-        margin: const EdgeInsets.all(2),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
-          color: Colors.brown,
-        ),
+    return Card(
+      child: SizedBox(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            SizedBox(
-              width: 100,
-              child: getAvatarFromUrl(participant.avatarUrl!),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SizedBox(
+                width: 50,
+                height: 50,
+                child: getAvatarFromUrl(participant.avatarUrl!),
+              ),
             ),
             Text(participant.name!),
             Text("Rating: " + participant.rating!),

@@ -18,18 +18,18 @@ mixin BaseScreen<Page extends BasePageScreen> on BasePageScreenState<Page> {
   Widget build(BuildContext context) {
     final themeChange = Provider.of<DarkThemeProvider>(context);
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(
-          appBarTitle(),
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
+      // appBar: AppBar(
+      //   centerTitle: true,
+      //   title: Text(
+      //     appBarTitle(),
+      //     style: const TextStyle(
+      //       fontSize: 20,
+      //       fontWeight: FontWeight.bold,
+      //     ),
+      //   ),
+      // ),
       body: Container(
-        child: body(),
+        child: body(context),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: (() {
@@ -59,5 +59,5 @@ mixin BaseScreen<Page extends BasePageScreen> on BasePageScreenState<Page> {
     );
   }
 
-  Widget body();
+  Widget body(BuildContext context);
 }

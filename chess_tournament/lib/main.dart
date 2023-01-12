@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
         builder: (BuildContext context, value, Widget? child) {
           return MaterialApp(
             title: 'Chess Tournament Planner',
-            initialRoute: '/',
+            initialRoute: 'welcome_screen',
             theme: Styles.themeData(themeChangeProvider.darkTheme, context),
             routes: {
               'welcome_screen': (context) => WelcomeScreen(),

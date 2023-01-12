@@ -25,7 +25,7 @@ class _LoginScreenState extends BasePageScreenState<LoginScreen>
   }
 
   @override
-  Widget body() {
+  Widget body(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -67,10 +67,8 @@ class _LoginScreenState extends BasePageScreenState<LoginScreen>
                     child: Text("Not a member?"),
                   ),
                   ElevatedButton(
-                    onPressed: (() => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => RegistrationScreen()))),
+                    onPressed: (() =>
+                        Navigator.pushNamed(context, "registration_screen")),
                     child: Text("Register here!"),
                   )
                 ],
@@ -94,8 +92,7 @@ class _LoginScreenState extends BasePageScreenState<LoginScreen>
       final user = await _auth.signInWithEmailAndPassword(
           email: emailController.text, password: passwordController.text);
       if (user != null) {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => HomeScreen()));
+        Navigator.pushNamed(context, "/");
       }
     } catch (e) {
       print(e);

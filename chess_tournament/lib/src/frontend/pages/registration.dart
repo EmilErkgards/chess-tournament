@@ -27,7 +27,7 @@ class _RegistrationScreenState extends BasePageScreenState<RegistrationScreen>
   }
 
   @override
-  Widget body() {
+  Widget body(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -90,10 +90,8 @@ class _RegistrationScreenState extends BasePageScreenState<RegistrationScreen>
                     child: Text("Already a member?"),
                   ),
                   ElevatedButton(
-                    onPressed: (() => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => LoginScreen()))),
+                    onPressed: (() =>
+                        Navigator.pushNamed(context, "login_screen")),
                     child: Text("Login here!"),
                   )
                 ],

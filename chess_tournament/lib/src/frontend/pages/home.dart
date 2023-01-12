@@ -31,7 +31,7 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
   }
 
   @override
-  Widget body() {
+  Widget body(BuildContext context) {
     return Center(
       // child: Container(
       //   decoration: BoxDecoration(

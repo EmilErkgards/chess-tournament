@@ -16,7 +16,7 @@ class _WelcomeScreenState extends BasePageScreenState<WelcomeScreen>
   }
 
   @override
-  Widget body() {
+  Widget body(BuildContext context) {
     return Center(
       child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

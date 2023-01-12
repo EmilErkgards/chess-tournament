@@ -1,7 +1,5 @@
 import 'package:chess_tournament/src/frontend/base_screen.dart';
-import 'package:chess_tournament/src/frontend/common/base_button.dart';
 import 'package:chess_tournament/src/frontend/pages/chess_clock.dart';
-import 'package:chess_tournament/src/frontend/pages/tournament_lobby.dart';
 import 'package:flutter/material.dart';
 
 import '../../backend/backend_file.dart';
@@ -27,7 +25,7 @@ class _TournamentOverviewScreenState
   }
 
   @override
-  Widget body() {
+  Widget body(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
