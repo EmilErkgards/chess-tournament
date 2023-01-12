@@ -108,13 +108,14 @@ class _RegistrationScreenState extends BasePageScreenState<RegistrationScreen>
       showSpinner = true;
     });
     try {
-      ChessUser user = await createChessUser(chessUsernameController.text);
+      ChessUser user =
+          await ChessUserService.createChessUser(chessUsernameController.text);
 
       final newUser = await _auth.createUserWithEmailAndPassword(
           email: emailController.text, password: passwordController.text);
 
       user.uuid = newUser.user!.uid;
-      user.docId = (await addUserToDB(user)).id;
+      user.docId = (await ChessUserService.addUserToDB(user)).id;
 
       Navigator.pushNamed(context, '/');
     } catch (e) {

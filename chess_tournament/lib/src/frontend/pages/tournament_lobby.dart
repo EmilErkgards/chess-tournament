@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:chess_tournament/src/backend/backend_file.dart';
+import 'package:chess_tournament/src/backend/tournament_service.dart';
 import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:chess_tournament/src/frontend/common/base_button.dart';
 import 'package:chess_tournament/src/frontend/pages/tournament_overview.dart';
@@ -9,7 +10,7 @@ import 'package:flutter/material.dart';
 class TournamentLobbyScreen extends BasePageScreen {
   final String tournamentCode;
   final bool isOwner;
-  bool isStarted = false;
+  bool isStarted;
 
   TournamentLobbyScreen({
     super.key,
@@ -30,7 +31,8 @@ class TournamentLobbyScreenState
   @override
   void initState() {
     super.initState();
-    participants = getTournamentParticipants(context, widget.tournamentCode);
+    participants = TournamentService.getTournamentParticipants(
+        context, widget.tournamentCode);
     setUpTimedFetch();
   }
 
@@ -53,8 +55,8 @@ class TournamentLobbyScreenState
       (timer) {
         setState(
           () {
-            participants =
-                getTournamentParticipants(context, widget.tournamentCode);
+            participants = TournamentService.getTournamentParticipants(
+                context, widget.tournamentCode);
           },
         );
       },
@@ -63,6 +65,14 @@ class TournamentLobbyScreenState
 
   void startTournament() async {
     //TODO start tournament
+    var p = await TournamentService.getTournamentParticipants(
+        context, widget.tournamentCode);
+    List<String> ids = [
+      p[0].docId!,
+      p[1].docId!,
+    ];
+    var x = TournamentService.generateRoundRobin(ids);
+    print(x);
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const TournamentOverviewScreen(),
@@ -79,6 +89,13 @@ class TournamentLobbyScreenState
   }
 
   void openTournamentSettings() {}
+
+  void deleteTournament() {
+    TournamentService.deleteTournament(widget.tournamentCode);
+    Navigator.of(context).pop();
+  }
+
+  void leaveTournament() {}
 
   @override
   Widget body(BuildContext context) {
@@ -157,7 +174,22 @@ class TournamentLobbyScreenState
                   text: "Tournament Settings",
                 ),
               ),
-            },
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: BaseButton(
+                  callback: deleteTournament,
+                  text: "Delete Tournament",
+                ),
+              ),
+            } else ...{
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: BaseButton(
+                  callback: leaveTournament,
+                  text: "Leave Tournament",
+                ),
+              ),
+            }
           ],
         ),
       ),
@@ -199,7 +231,8 @@ class TournamentLobbyScreenState
               child: SizedBox(
                 width: 50,
                 height: 50,
-                child: getAvatarFromUrl(participant.avatarUrl!),
+                child:
+                    ChessUserService.getAvatarFromUrl(participant.avatarUrl!),
               ),
             ),
             Text(participant.name!),

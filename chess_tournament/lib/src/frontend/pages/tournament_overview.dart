@@ -1,3 +1,4 @@
+import 'package:chess_tournament/src/backend/match_service.dart';
 import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:chess_tournament/src/frontend/pages/chess_clock.dart';
 import 'package:flutter/material.dart';
@@ -70,16 +71,16 @@ class _TournamentOverviewScreenState
       shrinkWrap: true,
       children: topThree.map((participant) {
         return Center(
-          child: Container(
+          child: SizedBox(
             width: 400,
-            height: 30,
-            margin: const EdgeInsets.all(2),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(5),
-              color: Colors.brown,
-            ),
-            child: Center(
-              child: leaderBoardCard(participant),
+            height: 60,
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                  child: leaderBoardCard(participant),
+                ),
+              ),
             ),
           ),
         );
@@ -102,17 +103,14 @@ class _TournamentOverviewScreenState
       shrinkWrap: true,
       children: matches.map((match) {
         return Center(
-          child: Container(
+          child: SizedBox(
             width: 400,
             height: 100,
-            margin: const EdgeInsets.all(5),
-            padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: Colors.brown,
-            ),
-            child: Center(
-              child: matchCard(match),
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: matchCard(match),
+              ),
             ),
           ),
         );

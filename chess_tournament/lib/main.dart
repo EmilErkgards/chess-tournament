@@ -1,8 +1,10 @@
+import 'package:chess_tournament/src/backend/backend_file.dart';
 import 'package:chess_tournament/src/backend/dark_theme.dart';
 import 'package:chess_tournament/src/frontend/pages/home.dart';
 import 'package:chess_tournament/src/frontend/pages/login.dart';
 import 'package:chess_tournament/src/frontend/pages/registration.dart';
 import 'package:chess_tournament/src/frontend/pages/welcome.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -17,6 +19,7 @@ void main() async {
       projectId: "chesstournamentplanner",
     ),
   );
+  ChessUserService.init(FirebaseFirestore.instance);
   runApp(MyApp());
 }
 
@@ -30,7 +33,6 @@ class MyApp extends StatelessWidget {
         await themeChangeProvider.darkThemePreference.getTheme();
   }
 
-  @override
   void initState() {
     getCurrentAppTheme();
   }
