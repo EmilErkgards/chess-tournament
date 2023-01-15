@@ -70,6 +70,9 @@ class TournamentLobbyScreenState
     List<String> ids = [
       p[0].docId!,
       p[1].docId!,
+      "532589325823",
+      "ghdasjghdsaik",
+      "ghudsgd089352"
     ];
     var x = TournamentService.generateRoundRobin(ids);
     print(x);
@@ -153,7 +156,7 @@ class TournamentLobbyScreenState
             ),
             if (widget.isStarted) ...{
               Padding(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(1),
                 child: BaseButton(
                   callback: goToTournament,
                   text: "Go To Tournament",
@@ -161,21 +164,21 @@ class TournamentLobbyScreenState
               ),
             } else if (widget.isOwner) ...{
               Padding(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(1),
                 child: BaseButton(
                   callback: startTournament,
                   text: "Start",
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(1),
                 child: BaseButton(
                   callback: openTournamentSettings,
                   text: "Tournament Settings",
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(1),
                 child: BaseButton(
                   callback: deleteTournament,
                   text: "Delete Tournament",
@@ -183,7 +186,7 @@ class TournamentLobbyScreenState
               ),
             } else ...{
               Padding(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(1),
                 child: BaseButton(
                   callback: leaveTournament,
                   text: "Leave Tournament",

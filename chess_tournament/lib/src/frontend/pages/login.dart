@@ -5,6 +5,7 @@ import 'package:chess_tournament/src/frontend/pages/home.dart';
 import 'package:chess_tournament/src/frontend/pages/registration.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/scheduler.dart';
 
 class LoginScreen extends BasePageScreen {
   @override
@@ -18,6 +19,16 @@ class _LoginScreenState extends BasePageScreenState<LoginScreen>
 
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      User? currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) return;
+      Navigator.pushNamed(context, '/');
+    });
+  }
 
   @override
   String appBarTitle() {

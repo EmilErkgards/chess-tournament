@@ -3,6 +3,7 @@ import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:chess_tournament/src/frontend/common/base_button.dart';
 import 'package:chess_tournament/src/frontend/common/base_input_field.dart';
 import 'package:chess_tournament/src/frontend/pages/tournament_lobby.dart';
+import 'package:chess_tournament/src/frontend/pages/welcome.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -25,25 +26,29 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
   @override
   void initState() {
     super.initState();
+
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       User? currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser == null) throw "Not logged in";
-
-      var currUser = await ChessUserService.getChessUserByUUID(currentUser.uid);
-      if (currUser!.tournamentCode != "") {
-        bool isOwner = await TournamentService.isTournamentOwner(
-            currUser, currUser.tournamentCode!);
-        bool isStarted = await TournamentService.isTournamentStarted(
-            currUser.tournamentCode!);
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => TournamentLobbyScreen(
-              tournamentCode: currUser.tournamentCode!,
-              isOwner: isOwner,
-              isStarted: isStarted,
+      if (currentUser == null) {
+        Navigator.pushNamed(context, 'welcome_screen');
+      } else {
+        var currUser =
+            await ChessUserService.getChessUserByUUID(currentUser.uid);
+        if (currUser!.tournamentCode != "") {
+          bool isOwner = await TournamentService.isTournamentOwner(
+              currUser, currUser.tournamentCode!);
+          bool isStarted = await TournamentService.isTournamentStarted(
+              currUser.tournamentCode!);
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => TournamentLobbyScreen(
+                tournamentCode: currUser.tournamentCode!,
+                isOwner: isOwner,
+                isStarted: isStarted,
+              ),
             ),
-          ),
-        );
+          );
+        }
       }
     });
   }

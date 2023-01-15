@@ -5,6 +5,7 @@ import 'package:chess_tournament/src/frontend/common/base_input_field.dart';
 import 'package:chess_tournament/src/frontend/pages/login.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/scheduler.dart';
 
 class RegistrationScreen extends BasePageScreen {
   @override
@@ -20,6 +21,16 @@ class _RegistrationScreenState extends BasePageScreenState<RegistrationScreen>
   final chessUsernameController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      User? currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) return;
+      Navigator.pushNamed(context, '/');
+    });
+  }
 
   @override
   String appBarTitle() {
@@ -114,7 +125,7 @@ class _RegistrationScreenState extends BasePageScreenState<RegistrationScreen>
       final newUser = await _auth.createUserWithEmailAndPassword(
           email: emailController.text, password: passwordController.text);
 
-      user.uuid = newUser.user!.uid;
+      user.userId = newUser.user!.uid;
       user.docId = (await ChessUserService.addUserToDB(user)).id;
 
       Navigator.pushNamed(context, '/');

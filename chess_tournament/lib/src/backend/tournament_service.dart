@@ -74,7 +74,7 @@ class TournamentService {
       "code": code.toString(),
       "state": "notStarted",
       "format": "roundRobin",
-      "owner": owner.uuid
+      "owner": owner.docId
     });
 
     return code.toString();
@@ -87,12 +87,14 @@ class TournamentService {
       return false;
     }
 
-    var dUser = await ChessUserService.getChessUserByUUID(user.uid);
-    if (dUser == null) throw "Could not find chess user with uuid: " + user.uid;
+    var chessUser = await ChessUserService.getChessUserByUUID(user.uid);
+    if (chessUser == null) {
+      throw "Could not find chess user with uuid: " + user.uid;
+    }
     try {
       FirebaseFirestore.instance
           .collection('users')
-          .doc(dUser.docId)
+          .doc(chessUser.docId)
           .update({"tournamentCode": code});
     } catch (error) {
       rethrow;

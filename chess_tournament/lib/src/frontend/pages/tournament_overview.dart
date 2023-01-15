@@ -46,11 +46,11 @@ class _TournamentOverviewScreenState
   }
 
   late List<ChessUser> participants = [
-    ChessUser(name: "Emil", rating: "1215", uuid: "bla"),
-    ChessUser(name: "Anton", rating: "1500", uuid: "bla"),
-    ChessUser(name: "Oskar", rating: "420", uuid: "bla"),
-    ChessUser(name: "Joel", rating: "69", uuid: "bla"),
-    ChessUser(name: "Anton", rating: "1337", uuid: "bla"),
+    ChessUser(name: "Emil", rating: "1215", userId: "bla"),
+    ChessUser(name: "Anton", rating: "1500", userId: "bla"),
+    ChessUser(name: "Oskar", rating: "420", userId: "bla"),
+    ChessUser(name: "Joel", rating: "69", userId: "bla"),
+    ChessUser(name: "Anton", rating: "1337", userId: "bla"),
   ];
 
   late List<ChessUser> topThree = [

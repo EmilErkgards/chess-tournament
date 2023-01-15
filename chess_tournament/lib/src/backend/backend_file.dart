@@ -10,7 +10,7 @@ import 'package:jovial_svg/jovial_svg.dart';
 
 class ChessUser {
   String? docId;
-  String? uuid;
+  String? userId;
   String? name;
   String? rating;
   String? tournamentCode;
@@ -18,7 +18,7 @@ class ChessUser {
 
   ChessUser({
     this.docId,
-    this.uuid,
+    this.userId,
     required this.name,
     this.rating,
     this.tournamentCode,
@@ -27,7 +27,7 @@ class ChessUser {
 
   ChessUser.fromJSON(Map<String, dynamic> snapshot, String dId) {
     docId = dId;
-    uuid = snapshot["uuid"];
+    userId = snapshot["userId"];
     name = snapshot["name"];
     rating = snapshot["rating"];
     tournamentCode = snapshot["tournamentCode"];
@@ -45,7 +45,7 @@ class ChessUserService {
   static Future<DocumentReference<Map<String, dynamic>>> addUserToDB(
       ChessUser user) async {
     return await firebaseInstance.collection('users').add({
-      "userId": user.uuid,
+      "userId": user.userId,
       "name": user.name,
       "rating": user.rating,
       "tournamentCode": user.tournamentCode,

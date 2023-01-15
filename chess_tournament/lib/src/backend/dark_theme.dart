@@ -64,7 +64,7 @@ class Styles {
 
       hintColor: isDarkTheme ? Colors.grey : Colors.grey,
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-          backgroundColor: isDarkTheme ? swatch[600] : swatch[500]),
+          backgroundColor: isDarkTheme ? swatch[400] : swatch[500]),
       // highlightColor: isDarkTheme ? swatch[400] : swatch[400],
       // hoverColor: isDarkTheme ? Colors.black : swatch[700],
       // focusColor: isDarkTheme ? Color(0xff0B2512) : Color(0xffA8DAB5),

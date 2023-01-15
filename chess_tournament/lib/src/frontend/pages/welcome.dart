@@ -1,5 +1,7 @@
 import 'package:chess_tournament/src/frontend/common/base_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 import '../base_screen.dart';
 
@@ -10,6 +12,17 @@ class WelcomeScreen extends BasePageScreen {
 
 class _WelcomeScreenState extends BasePageScreenState<WelcomeScreen>
     with BaseScreen {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      User? currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) return;
+      Navigator.pushNamed(context, '/');
+    });
+  }
+
   @override
   String appBarTitle() {
     return "Welcome";
