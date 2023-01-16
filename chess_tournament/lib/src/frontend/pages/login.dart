@@ -1,11 +1,10 @@
 import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:chess_tournament/src/frontend/common/base_button.dart';
 import 'package:chess_tournament/src/frontend/common/base_input_field.dart';
-import 'package:chess_tournament/src/frontend/pages/home.dart';
-import 'package:chess_tournament/src/frontend/pages/registration.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:sizer/sizer.dart';
 
 class LoginScreen extends BasePageScreen {
   @override
@@ -43,24 +42,36 @@ class _LoginScreenState extends BasePageScreenState<LoginScreen>
         children: [
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(2.w),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  BaseInputField(
-                    numbersOnly: false,
-                    placeholderText: 'Email',
-                    textFieldController: emailController,
-                    validatorCallback: (String) {},
+                  Padding(
+                    padding: EdgeInsets.all(2.w),
+                    child: SizedBox(
+                      width: 70.w,
+                      child: BaseInputField(
+                        numbersOnly: false,
+                        placeholderText: 'Email',
+                        textFieldController: emailController,
+                        validatorCallback: (String) {},
+                      ),
+                    ),
                   ),
-                  BaseInputField(
-                    numbersOnly: false,
-                    placeholderText: 'Password',
-                    textFieldController: passwordController,
-                    validatorCallback: (String) {},
-                    valueVisible: false,
-                    callbackOnSubmitted: tryLoginCallback,
+                  Padding(
+                    padding: EdgeInsets.all(2.w),
+                    child: SizedBox(
+                      width: 70.w,
+                      child: BaseInputField(
+                        numbersOnly: false,
+                        placeholderText: 'Password',
+                        textFieldController: passwordController,
+                        validatorCallback: (String) {},
+                        valueVisible: false,
+                        callbackOnSubmitted: tryLoginCallback,
+                      ),
+                    ),
                   ),
                   BaseButton(text: 'Login', callback: tryLogin)
                 ],

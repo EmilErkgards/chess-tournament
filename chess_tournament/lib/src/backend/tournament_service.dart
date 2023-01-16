@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:chess_tournament/src/backend/backend_file.dart';
-import 'package:chess_tournament/src/backend/match_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -10,14 +9,14 @@ class Tournament {
   String? docId;
   String? code;
   String? state;
-  String? format;
+  String? settings;
   ChessUser? owner;
 
   Tournament({
     required this.docId,
     required this.code,
     required this.state,
-    required this.format,
+    required this.settings,
     required this.owner,
   });
 
@@ -25,10 +24,14 @@ class Tournament {
       Map<String, dynamic> snapshot, String docId) async {
     var code = snapshot["code"];
     var state = snapshot["state"];
-    var format = snapshot["format"];
+    var settings = snapshot["settings"];
     var owner = await ChessUserService.getUserById(snapshot["black"]);
     return Tournament(
-        docId: docId, code: code, state: state, format: format, owner: owner);
+        docId: docId,
+        code: code,
+        state: state,
+        settings: settings,
+        owner: owner);
   }
 }
 
@@ -168,13 +171,28 @@ class TournamentService {
     return schedule;
   }
 
+  static Future<void> deleteTournamentSettings(String id) async {
+    await FirebaseFirestore.instance
+        .collection('tournamentSettings')
+        .get()
+        .then((value) async => {
+              value.docs.forEach((element) {
+                if (element.id == id) {
+                  FirebaseFirestore.instance
+                      .runTransaction((Transaction myTransaction) async {
+                    myTransaction.delete(element.reference);
+                  });
+                }
+              })
+            });
+  }
+
   static Future<void> deleteTournament(String tournamentCode) async {
     var codeExists = await codeExistsInDB(tournamentCode);
 
     if (!codeExists) {
       throw "";
     }
-    DocumentReference<Object?>? doc;
     try {
       FirebaseFirestore.instance
           .collection("tournaments")
@@ -186,6 +204,7 @@ class TournamentService {
                         .runTransaction((Transaction myTransaction) async {
                       myTransaction.delete(element.reference);
                     });
+                    deleteTournamentSettings(element.data()["settings"]);
                   }
                 })
               });
@@ -194,7 +213,7 @@ class TournamentService {
     }
 
     try {
-      final response = FirebaseFirestore.instance
+      FirebaseFirestore.instance
           .collection('users')
           .where('tournamentCode', isEqualTo: tournamentCode)
           .get()

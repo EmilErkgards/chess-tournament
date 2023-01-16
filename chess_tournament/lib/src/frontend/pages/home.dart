@@ -3,10 +3,10 @@ import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:chess_tournament/src/frontend/common/base_button.dart';
 import 'package:chess_tournament/src/frontend/common/base_input_field.dart';
 import 'package:chess_tournament/src/frontend/pages/tournament_lobby.dart';
-import 'package:chess_tournament/src/frontend/pages/welcome.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:sizer/sizer.dart';
 
 import '../../backend/backend_file.dart';
 
@@ -63,7 +63,7 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
     return Center(
       child: Card(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(2.w),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
@@ -72,28 +72,34 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
                 key: formKey,
                 child: Column(
                   children: [
-                    BaseInputField(
-                      numbersOnly: true,
-                      placeholderText: "Enter tournament code...",
-                      validatorCallback: ((value) {
-                        if (value.length == 6) {
-                          return null;
-                        }
-                        //TODO
-                        return 'Please enter a 6 digit code!';
-                      }),
-                      textFieldController: tournamentCodeController,
+                    Padding(
+                      padding: EdgeInsets.all(2.w),
+                      child: SizedBox(
+                        width: 70.w,
+                        child: BaseInputField(
+                          numbersOnly: true,
+                          placeholderText: "Enter tournament code...",
+                          validatorCallback: ((value) {
+                            if (value.length == 6) {
+                              return null;
+                            }
+                            //TODO
+                            return 'Please enter a 6 digit code!';
+                          }),
+                          textFieldController: tournamentCodeController,
+                        ),
+                      ),
                     ),
                     BaseButton(callback: _onJoin, text: "Join"),
                   ],
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.all(8.0),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: .5.h, horizontal: 2.w),
                 child: SizedBox(
-                  width: 300,
-                  height: 20,
-                  child: Center(
+                  width: 70.w,
+                  height: 2.h,
+                  child: const Center(
                     child: Text("OR"),
                   ),
                 ),

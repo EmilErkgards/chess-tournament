@@ -1,3 +1,5 @@
+import 'package:chess_tournament/src/backend/tournament_service.dart';
+import 'package:chess_tournament/src/backend/tournament_settings_service.dart';
 import 'package:chess_tournament/src/frontend/common/base_button.dart';
 import 'package:chess_tournament/src/frontend/common/base_input_increment.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,13 @@ import 'package:sizer/sizer.dart';
 import '../base_screen.dart';
 
 class TournamentSettingsScreen extends BasePageScreen {
+  final String tournamentCode;
+
+  TournamentSettingsScreen({
+    super.key,
+    required this.tournamentCode,
+  });
+
   @override
   _TournamentSettingsScreenState createState() =>
       _TournamentSettingsScreenState();
@@ -13,12 +22,14 @@ class TournamentSettingsScreen extends BasePageScreen {
 
 class _TournamentSettingsScreenState
     extends BasePageScreenState<TournamentSettingsScreen> with BaseScreen {
+  int gameTime = 0;
+  int incrementTime = 0;
+  String format = 'Round Robin';
+
   @override
   String appBarTitle() {
     return "Tournament Settings";
   }
-
-  String dropdownvalue = 'Round Robin';
 
   //TODO: fetch format from db
   var items = [
@@ -60,7 +71,7 @@ class _TournamentSettingsScreenState
                   child: DropdownButton(
                     isExpanded: true,
                     // Initial Value
-                    value: dropdownvalue,
+                    value: format,
 
                     // Down Arrow Icon
                     icon: const Icon(Icons.keyboard_arrow_down),
@@ -81,36 +92,10 @@ class _TournamentSettingsScreenState
                     // change button value to selected value
                     onChanged: (String? newValue) {
                       setState(() {
-                        dropdownvalue = newValue!;
+                        format = newValue!;
                       });
                     },
                   ),
-                ),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                width: 35.w,
-                child: Padding(
-                  padding: EdgeInsets.all(4.w),
-                  child: Text(
-                    "Increment",
-                    textAlign: TextAlign.start,
-                    style: TextStyle(
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w100,
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 65.w,
-                child: Padding(
-                  padding: EdgeInsets.all(4.w),
-                  child: BaseInputIncrement(onChanged: onCounterChanged),
                 ),
               ),
             ],
@@ -137,7 +122,7 @@ class _TournamentSettingsScreenState
                 child: Padding(
                   padding: EdgeInsets.all(4.w),
                   child: BaseInputIncrement(
-                    onChanged: onCounterChanged,
+                    onChanged: onGameTimeCounterChanged,
                     maxValue: 60,
                     startValue: 10,
                   ),
@@ -145,16 +130,58 @@ class _TournamentSettingsScreenState
               ),
             ],
           ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 35.w,
+                child: Padding(
+                  padding: EdgeInsets.all(4.w),
+                  child: Text(
+                    "Increment",
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w100,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 65.w,
+                child: Padding(
+                  padding: EdgeInsets.all(4.w),
+                  child:
+                      BaseInputIncrement(onChanged: onIncrementCounterChanged),
+                ),
+              ),
+            ],
+          ),
           BaseButton(
             text: 'Apply',
-            callback: () {},
+            callback: onApply,
           ),
         ],
       ),
     );
   }
 
-  void onCounterChanged(int value) {
-    print(value);
+  void onIncrementCounterChanged(int value) {
+    incrementTime = value;
+  }
+
+  void onGameTimeCounterChanged(int value) {
+    gameTime = value;
+  }
+
+  void onApply() {
+    TournamentSettingsService.setTournamentSettings(
+        widget.tournamentCode,
+        TournamentSettings(
+          format: format,
+          increment: incrementTime.toString(),
+          timePerMatch: gameTime.toString(),
+        ));
+    Navigator.pop(context);
   }
 }

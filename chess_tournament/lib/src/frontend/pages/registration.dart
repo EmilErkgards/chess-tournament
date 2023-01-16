@@ -2,10 +2,10 @@ import 'package:chess_tournament/src/backend/backend_file.dart';
 import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:chess_tournament/src/frontend/common/base_button.dart';
 import 'package:chess_tournament/src/frontend/common/base_input_field.dart';
-import 'package:chess_tournament/src/frontend/pages/login.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:sizer/sizer.dart';
 
 class RegistrationScreen extends BasePageScreen {
   @override
@@ -50,40 +50,64 @@ class _RegistrationScreenState extends BasePageScreenState<RegistrationScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  BaseInputField(
-                    numbersOnly: false,
-                    placeholderText: 'Email',
-                    textFieldController: emailController,
-                    validatorCallback: (String) {
-                      //TODO check if already registered
-                    },
+                  Padding(
+                    padding: EdgeInsets.all(2.w),
+                    child: SizedBox(
+                      width: 70.w,
+                      child: BaseInputField(
+                        numbersOnly: false,
+                        placeholderText: 'Email',
+                        textFieldController: emailController,
+                        validatorCallback: (String) {
+                          //TODO check if already registered
+                        },
+                      ),
+                    ),
                   ),
-                  BaseInputField(
-                    numbersOnly: false,
-                    placeholderText: 'Chess.com Username',
-                    textFieldController: chessUsernameController,
-                    validatorCallback: (String) {
-                      //TODO Check if exists
-                    },
+                  Padding(
+                    padding: EdgeInsets.all(2.w),
+                    child: SizedBox(
+                      width: 70.w,
+                      child: BaseInputField(
+                        numbersOnly: false,
+                        placeholderText: 'Chess.com Username',
+                        textFieldController: chessUsernameController,
+                        validatorCallback: (String) {
+                          //TODO Check if exists
+                        },
+                      ),
+                    ),
                   ),
-                  BaseInputField(
-                    numbersOnly: false,
-                    placeholderText: 'Password',
-                    textFieldController: passwordController,
-                    validatorCallback: (String) {},
-                    valueVisible: false,
+                  Padding(
+                    padding: EdgeInsets.all(2.w),
+                    child: SizedBox(
+                      width: 70.w,
+                      child: BaseInputField(
+                        numbersOnly: false,
+                        placeholderText: 'Password',
+                        textFieldController: passwordController,
+                        validatorCallback: (String) {},
+                        valueVisible: false,
+                      ),
+                    ),
                   ),
-                  BaseInputField(
-                    numbersOnly: false,
-                    placeholderText: 'Confirm Password',
-                    textFieldController: confirmPasswordController,
-                    validatorCallback: (string) {
-                      if (string == passwordController.text) {
-                        return null;
-                      }
-                      return "Password doesn't match";
-                    },
-                    valueVisible: false,
+                  Padding(
+                    padding: EdgeInsets.all(2.w),
+                    child: SizedBox(
+                      width: 70.w,
+                      child: BaseInputField(
+                        numbersOnly: false,
+                        placeholderText: 'Confirm Password',
+                        textFieldController: confirmPasswordController,
+                        validatorCallback: (string) {
+                          if (string == passwordController.text) {
+                            return null;
+                          }
+                          return "Password doesn't match";
+                        },
+                        valueVisible: false,
+                      ),
+                    ),
                   ),
                   BaseButton(text: 'Register', callback: registerUser),
                 ],

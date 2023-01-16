@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 class BaseButton extends StatefulWidget {
   final Function() callback;
@@ -13,10 +14,10 @@ class _BaseButtonState extends State<BaseButton> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: EdgeInsets.all(2.w),
       child: SizedBox(
-        width: 300,
-        height: 50,
+        width: 70.w,
+        height: 5.h,
         child: ElevatedButton(
           onPressed: widget.callback,
           child: Text(widget.text),

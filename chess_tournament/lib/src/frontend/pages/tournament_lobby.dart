@@ -95,7 +95,9 @@ class TournamentLobbyScreenState
   void openTournamentSettings() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => TournamentSettingsScreen(),
+        builder: (context) => TournamentSettingsScreen(
+          tournamentCode: widget.tournamentCode,
+        ),
       ),
     );
   }
