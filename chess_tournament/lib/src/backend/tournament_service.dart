@@ -229,4 +229,24 @@ class TournamentService {
       print(error);
     }
   }
+
+  static Future<void> leaveTournament() async {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    try {
+      var currUser =
+          await ChessUserService.getChessUserByUUID(currentUser!.uid);
+      FirebaseFirestore.instance.collection('users').get().then((value) async {
+        value.docs.forEach((element) {
+          if (element.id == currUser!.docId) {
+            FirebaseFirestore.instance
+                .collection('users')
+                .doc(element.id)
+                .update({"tournamentCode": ""});
+          }
+        });
+      });
+    } catch (error) {
+      print(error);
+    }
+  }
 }

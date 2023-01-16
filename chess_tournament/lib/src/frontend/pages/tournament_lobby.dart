@@ -107,7 +107,10 @@ class TournamentLobbyScreenState
     Navigator.of(context).pop();
   }
 
-  void leaveTournament() {}
+  void leaveTournament() {
+    TournamentService.leaveTournament();
+    Navigator.of(context).pop();
+  }
 
   @override
   Widget body(BuildContext context) {

@@ -79,19 +79,19 @@ class _LoginScreenState extends BasePageScreenState<LoginScreen>
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(2.w),
             child: Center(
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text("Not a member?"),
+                  Padding(
+                    padding: EdgeInsets.all(2.w),
+                    child: const Text("Not a member?"),
                   ),
                   ElevatedButton(
                     onPressed: (() =>
                         Navigator.pushNamed(context, "registration_screen")),
-                    child: Text("Register here!"),
+                    child: const Text("Register here!"),
                   )
                 ],
               ),

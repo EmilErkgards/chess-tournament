@@ -46,18 +46,5 @@ class TournamentSettingsService {
         });
       });
     });
-
-    FirebaseFirestore.instance
-        .collection('users')
-        .where('tournamentCode', isEqualTo: tournamentCode)
-        .get()
-        .then((value) async {
-      value.docs.forEach((element) {
-        FirebaseFirestore.instance
-            .collection('users')
-            .doc(element.id)
-            .update({"tournamentCode": ""});
-      });
-    });
   }
 }
