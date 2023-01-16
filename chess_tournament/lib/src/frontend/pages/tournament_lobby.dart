@@ -5,6 +5,7 @@ import 'package:chess_tournament/src/backend/tournament_service.dart';
 import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:chess_tournament/src/frontend/common/base_button.dart';
 import 'package:chess_tournament/src/frontend/pages/tournament_overview.dart';
+import 'package:chess_tournament/src/frontend/pages/tournament_settings.dart';
 import 'package:flutter/material.dart';
 
 class TournamentLobbyScreen extends BasePageScreen {
@@ -91,7 +92,13 @@ class TournamentLobbyScreenState
     );
   }
 
-  void openTournamentSettings() {}
+  void openTournamentSettings() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => TournamentSettingsScreen(),
+      ),
+    );
+  }
 
   void deleteTournament() {
     TournamentService.deleteTournament(widget.tournamentCode);

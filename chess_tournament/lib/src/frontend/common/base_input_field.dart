@@ -28,28 +28,21 @@ class _BaseInputFieldState extends State<BaseInputField> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: SizedBox(
-        width: 300,
-        height: height,
-        child: TextFormField(
-          obscureText: !widget.valueVisible,
-          inputFormatters: [
-            if (widget.numbersOnly) ...{
-              FilteringTextInputFormatter.digitsOnly,
-            }
-          ],
-          keyboardType: TextInputType.number,
-          validator: validator,
-          textAlign: TextAlign.center,
-          onFieldSubmitted: widget.callbackOnSubmitted,
-          controller: widget.textFieldController,
-          decoration: InputDecoration(
-            border: const OutlineInputBorder(),
-            hintText: widget.placeholderText,
-          ),
-        ),
+    return TextFormField(
+      obscureText: !widget.valueVisible,
+      inputFormatters: [
+        if (widget.numbersOnly) ...{
+          FilteringTextInputFormatter.digitsOnly,
+        }
+      ],
+      keyboardType: TextInputType.number,
+      validator: validator,
+      textAlign: TextAlign.center,
+      onFieldSubmitted: widget.callbackOnSubmitted,
+      controller: widget.textFieldController,
+      decoration: InputDecoration(
+        border: const OutlineInputBorder(),
+        hintText: widget.placeholderText,
       ),
     );
   }

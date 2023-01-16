@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sizer/sizer.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,17 +46,19 @@ class MyApp extends StatelessWidget {
       },
       child: Consumer<DarkThemeProvider>(
         builder: (BuildContext context, value, Widget? child) {
-          return MaterialApp(
-            title: 'Chess Tournament Planner',
-            initialRoute: '/',
-            theme: Styles.themeData(themeChangeProvider.darkTheme, context),
-            routes: {
-              'welcome_screen': (context) => WelcomeScreen(),
-              'registration_screen': (context) => RegistrationScreen(),
-              'login_screen': (context) => LoginScreen(),
-              '/': (context) => HomeScreen()
-            },
-          );
+          return Sizer(builder: (context, orientation, deviceType) {
+            return MaterialApp(
+              title: 'Chess Tournament Planner',
+              initialRoute: '/',
+              theme: Styles.themeData(themeChangeProvider.darkTheme, context),
+              routes: {
+                'welcome_screen': (context) => WelcomeScreen(),
+                'registration_screen': (context) => RegistrationScreen(),
+                'login_screen': (context) => LoginScreen(),
+                '/': (context) => HomeScreen()
+              },
+            );
+          });
         },
       ),
     );

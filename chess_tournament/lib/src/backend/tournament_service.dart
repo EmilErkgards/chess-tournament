@@ -64,16 +64,29 @@ class TournamentService {
     return retVal;
   }
 
+  static Future<String> createDefaultTournamentSettings() async {
+    var docRef =
+        await FirebaseFirestore.instance.collection('tournamentSettings').add({
+      "format": "roundRobin",
+      "timePerMatch": 10,
+      "increment": 1,
+    });
+
+    return docRef.id;
+  }
+
   static Future<String> addTournament(ChessUser owner) async {
     int code = generateCode();
     while ((await codeExistsInDB(code.toString()))) {
       code = generateCode();
     }
 
+    var settingsDocRef = await createDefaultTournamentSettings();
+
     FirebaseFirestore.instance.collection('tournaments').add({
       "code": code.toString(),
       "state": "notStarted",
-      "format": "roundRobin",
+      "settings": settingsDocRef,
       "owner": owner.docId
     });
 

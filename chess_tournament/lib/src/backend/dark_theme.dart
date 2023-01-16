@@ -48,7 +48,7 @@ class Styles {
       );
     }
 
-    Color darkBG = Color(0xff312E2B);
+    Color darkBG = Color.fromARGB(255, 71, 66, 62);
     Color darkCard = Color(0xff211F1E);
 
     Color lightBG = Color(0xffF0F0F0);
