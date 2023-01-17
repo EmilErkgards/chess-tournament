@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_multi_formatter/formatters/masked_input_formatter.dart';
 
 class BaseInputField extends StatefulWidget {
   final bool numbersOnly;
+  final int? maxCharacters;
   final String placeholderText;
   final Function(String) validatorCallback;
   final TextEditingController? textFieldController;
@@ -16,6 +18,7 @@ class BaseInputField extends StatefulWidget {
     required this.validatorCallback,
     required this.textFieldController,
     this.valueVisible = true,
+    this.maxCharacters,
     this.callbackOnSubmitted,
   });
 
@@ -33,6 +36,9 @@ class _BaseInputFieldState extends State<BaseInputField> {
       inputFormatters: [
         if (widget.numbersOnly) ...{
           FilteringTextInputFormatter.digitsOnly,
+        },
+        if (widget.maxCharacters != null) ...{
+          LengthLimitingTextInputFormatter(widget.maxCharacters),
         }
       ],
       keyboardType: TextInputType.number,

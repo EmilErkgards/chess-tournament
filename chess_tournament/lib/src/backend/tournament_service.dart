@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:chess_tournament/src/backend/backend_file.dart';
+import 'package:chess_tournament/src/backend/match_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -71,8 +72,9 @@ class TournamentService {
     var docRef =
         await FirebaseFirestore.instance.collection('tournamentSettings').add({
       "format": "roundRobin",
-      "timePerMatch": 10,
+      "totalTime": 10,
       "increment": 1,
+      "evenTimeSplit": true,
     });
 
     return docRef.id;
@@ -153,22 +155,44 @@ class TournamentService {
     return retVal;
   }
 
-  static List<List<String>> generateRoundRobin(List<String> ids) {
-    int n = ids.length;
-    List<List<String>> schedule =
-        List.generate(n - 1, (_) => List.filled(n, ""));
+  static List<ChessMatch?> generateRoundRobin(
+      List<ChessUser> participants, int totalTime, bool evenTimeSplit) {
+    int numberOfRounds = participants.length - 1;
+    if (participants.length % 2 != 0) {
+      numberOfRounds = participants.length;
+    }
 
-    for (int i = 0; i < n - 1; i++) {
-      for (int j = 0; j < n; j++) {
-        int opponent = (i + j) % (n - 1);
-        if (j == 0) {
-          schedule[i][j] = ids[n - 1];
+    List<ChessMatch?> matches =
+        List.filled(numberOfRounds * (participants.length / 2).ceil(), null);
+
+    int index = 0;
+
+    for (int i = 0; i < participants.length; i++) {
+      for (int j = i + 1; j < participants.length; j++) {
+        ChessUser? white;
+        ChessUser? black;
+        if (index % 2 == 0) {
+          white = participants[i];
+          black = participants[j];
         } else {
-          schedule[i][j] = ids[opponent];
+          white = participants[j];
+          black = participants[i];
         }
+        double whiteTime = totalTime / 2;
+        double blackTime = totalTime / 2;
+        if (!evenTimeSplit) {
+          //Call algorithm
+        }
+        matches[index++] = (ChessMatch(
+            white: white,
+            black: black,
+            whiteTime: whiteTime,
+            blackTime: blackTime,
+            result: "notStarted"));
       }
     }
-    return schedule;
+
+    return matches;
   }
 
   static Future<void> deleteTournamentSettings(String id) async {

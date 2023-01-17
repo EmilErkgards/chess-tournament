@@ -60,10 +60,34 @@ class _TournamentOverviewScreenState
   ];
 
   late List<ChessMatch> matches = [
-    ChessMatch(docId: '', white: participants[0], black: participants[1]),
-    ChessMatch(docId: '', white: participants[2], black: participants[3]),
-    ChessMatch(docId: '', white: participants[4], black: participants[2]),
-    ChessMatch(docId: '', white: participants[3], black: participants[1]),
+    ChessMatch(
+        docId: '',
+        white: participants[0],
+        black: participants[1],
+        whiteTime: 300,
+        blackTime: 300,
+        result: "notStarted"),
+    ChessMatch(
+        docId: '',
+        white: participants[2],
+        black: participants[3],
+        whiteTime: 300,
+        blackTime: 300,
+        result: "notStarted"),
+    ChessMatch(
+        docId: '',
+        white: participants[4],
+        black: participants[2],
+        whiteTime: 300,
+        blackTime: 300,
+        result: "notStarted"),
+    ChessMatch(
+        docId: '',
+        white: participants[3],
+        black: participants[1],
+        whiteTime: 300,
+        blackTime: 300,
+        result: "notStarted"),
   ];
 
   Widget minimizedLeaderBoard() {

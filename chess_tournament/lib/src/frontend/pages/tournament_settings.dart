@@ -1,6 +1,6 @@
-import 'package:chess_tournament/src/backend/tournament_service.dart';
 import 'package:chess_tournament/src/backend/tournament_settings_service.dart';
 import 'package:chess_tournament/src/frontend/common/base_button.dart';
+import 'package:chess_tournament/src/frontend/common/base_input_field.dart';
 import 'package:chess_tournament/src/frontend/common/base_input_increment.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
@@ -25,16 +25,29 @@ class TournamentSettingsScreen extends BasePageScreen {
 class _TournamentSettingsScreenState
     extends BasePageScreenState<TournamentSettingsScreen> with BaseScreen {
   int gameTime = 0;
+  int gameTimeMinutes = 0;
+  int gameTimeSeconds = 0;
   int incrementTime = 0;
+  int incrementTimeMinutes = 0;
+  int incrementTimeSeconds = 0;
   String format = '';
+  bool evenTimeSplit = true;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     format = widget.currentSettings.format!;
-    gameTime = int.parse(widget.currentSettings.timePerMatch!);
-    incrementTime = int.parse(widget.currentSettings.increment!);
+
+    gameTime = widget.currentSettings.totalTime!;
+    gameTimeMinutes = (gameTime / 60).floor();
+    gameTimeSeconds = gameTime - gameTimeMinutes * 60;
+
+    incrementTime = widget.currentSettings.increment!;
+    incrementTimeMinutes = (incrementTime / 60).floor();
+    incrementTimeSeconds = incrementTime - incrementTimeMinutes * 60;
+
+    evenTimeSplit = widget.currentSettings.evenTimeSplit!;
   }
 
   @override
@@ -107,7 +120,7 @@ class _TournamentSettingsScreenState
             ],
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               SizedBox(
                 width: 35.w,
@@ -125,15 +138,41 @@ class _TournamentSettingsScreenState
               ),
               SizedBox(
                 width: 65.w,
-                child: Padding(
-                  padding: EdgeInsets.all(4.w),
-                  child: BaseInputIncrement(
-                    onChanged: onGameTimeCounterChanged,
-                    maxValue: 60,
-                    startValue: int.parse(widget.currentSettings.timePerMatch!),
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      height: 25.h,
+                      child: BaseInputIncrement(
+                        onChanged: onGameTimeMinuteCounterChanged,
+                        maxValue: 59,
+                        minValue: 1,
+                        startValue: gameTimeMinutes,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 0, 0, .5.h),
+                      child: Text(
+                        ":",
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w100,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 25.h,
+                      child: BaseInputIncrement(
+                        onChanged: onGameTimeSecondCounterChanged,
+                        maxValue: 59,
+                        minValue: 0,
+                        startValue: gameTimeSeconds,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
+              )
             ],
           ),
           Row(
@@ -155,15 +194,41 @@ class _TournamentSettingsScreenState
               ),
               SizedBox(
                 width: 65.w,
-                child: Padding(
-                  padding: EdgeInsets.all(4.w),
-                  child: BaseInputIncrement(
-                    onChanged: onIncrementCounterChanged,
-                    minValue: 0,
-                    startValue: int.parse(widget.currentSettings.increment!),
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      height: 25.h,
+                      child: BaseInputIncrement(
+                        onChanged: onIncrementMinuteCounterChanged,
+                        maxValue: 59,
+                        minValue: 0,
+                        startValue: incrementTimeMinutes,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 0, 0, .5.h),
+                      child: Text(
+                        ":",
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w100,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 25.h,
+                      child: BaseInputIncrement(
+                        onChanged: onIncrementSecondCounterChanged,
+                        maxValue: 59,
+                        minValue: 0,
+                        startValue: incrementTimeSeconds,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
+              )
             ],
           ),
           BaseButton(
@@ -175,12 +240,24 @@ class _TournamentSettingsScreenState
     );
   }
 
-  void onIncrementCounterChanged(int value) {
-    incrementTime = value;
+  void onIncrementMinuteCounterChanged(int value) {
+    incrementTimeMinutes = value;
+    incrementTime = incrementTimeSeconds + incrementTimeMinutes * 60;
   }
 
-  void onGameTimeCounterChanged(int value) {
-    gameTime = value;
+  void onIncrementSecondCounterChanged(int value) {
+    incrementTimeSeconds = value;
+    incrementTime = incrementTimeSeconds + incrementTimeMinutes * 60;
+  }
+
+  void onGameTimeMinuteCounterChanged(int value) {
+    gameTimeMinutes = value;
+    gameTime = gameTimeSeconds + gameTimeMinutes * 60;
+  }
+
+  void onGameTimeSecondCounterChanged(int value) {
+    gameTimeSeconds = value;
+    gameTime = gameTimeSeconds + gameTimeMinutes * 60;
   }
 
   void onApply() {
@@ -188,8 +265,9 @@ class _TournamentSettingsScreenState
         widget.tournamentCode,
         TournamentSettings(
           format: format,
-          increment: incrementTime.toString(),
-          timePerMatch: gameTime.toString(),
+          increment: incrementTime,
+          totalTime: gameTime,
+          evenTimeSplit: evenTimeSplit,
         ));
     Navigator.pop(context);
   }

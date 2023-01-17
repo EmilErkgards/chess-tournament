@@ -3,26 +3,30 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class TournamentSettings {
   String? docId;
   String? format;
-  String? increment;
-  String? timePerMatch;
+  int? increment;
+  int? totalTime;
+  bool? evenTimeSplit;
 
   TournamentSettings({
     this.docId,
     required this.format,
     required this.increment,
-    required this.timePerMatch,
+    required this.totalTime,
+    required this.evenTimeSplit,
   });
 
   static Future<TournamentSettings> fromJSON(
       Map<String, dynamic> snapshot, String docId) async {
     var format = snapshot["format"];
     var increment = snapshot["increment"];
-    var timePerMatch = snapshot["timePerMatch"];
+    var timePerMatch = snapshot["totalTime"];
+    var evenTimeSplit = snapshot["evenTimeSplit"];
     return TournamentSettings(
       docId: docId,
       format: format,
       increment: increment,
-      timePerMatch: timePerMatch,
+      totalTime: timePerMatch,
+      evenTimeSplit: evenTimeSplit,
     );
   }
 }
@@ -42,7 +46,8 @@ class TournamentSettingsService {
             .update({
           "format": settings.format,
           "increment": settings.increment,
-          "timePerMatch": settings.timePerMatch
+          "totalTime": settings.totalTime,
+          "evenTimeSplit": settings.evenTimeSplit,
         });
       });
     });

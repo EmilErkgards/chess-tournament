@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:chess_tournament/src/backend/backend_file.dart';
+import 'package:chess_tournament/src/backend/match_service.dart';
 import 'package:chess_tournament/src/backend/tournament_service.dart';
 import 'package:chess_tournament/src/backend/tournament_settings_service.dart';
 import 'package:chess_tournament/src/frontend/base_screen.dart';
@@ -68,22 +69,25 @@ class TournamentLobbyScreenState
 
   void startTournament() async {
     //TODO start tournament
-    var p = await TournamentService.getTournamentParticipants(
+    var participants = await TournamentService.getTournamentParticipants(
         context, widget.tournamentCode);
-    List<String> ids = [
-      p[0].docId!,
-      p[1].docId!,
-      "532589325823",
-      "ghdasjghdsaik",
-      "ghudsgd089352"
-    ];
-    var x = TournamentService.generateRoundRobin(ids);
-    print(x);
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const TournamentOverviewScreen(),
-      ),
-    );
+    TournamentSettings settings =
+        await TournamentSettingsService.getTournamentSettings(
+            widget.tournamentCode);
+    var x = TournamentService.generateRoundRobin(
+        participants, settings.totalTime!, settings.evenTimeSplit!);
+    for (int i = 0; i < x.length; i++) {
+      print(i.toString() +
+          ": " +
+          x[i]!.white!.userId! +
+          " vs " +
+          x[i]!.black!.userId!);
+    }
+    // Navigator.of(context).push(
+    //   MaterialPageRoute(
+    //     builder: (context) => const TournamentOverviewScreen(),
+    //   ),
+    // );
   }
 
   void goToTournament() {
