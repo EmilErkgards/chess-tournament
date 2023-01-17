@@ -9,10 +9,12 @@ import '../base_screen.dart';
 
 class TournamentSettingsScreen extends BasePageScreen {
   final String tournamentCode;
+  final TournamentSettings currentSettings;
 
   TournamentSettingsScreen({
     super.key,
     required this.tournamentCode,
+    required this.currentSettings,
   });
 
   @override
@@ -24,7 +26,16 @@ class _TournamentSettingsScreenState
     extends BasePageScreenState<TournamentSettingsScreen> with BaseScreen {
   int gameTime = 0;
   int incrementTime = 0;
-  String format = 'Round Robin';
+  String format = '';
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    format = widget.currentSettings.format!;
+    gameTime = int.parse(widget.currentSettings.timePerMatch!);
+    incrementTime = int.parse(widget.currentSettings.increment!);
+  }
 
   @override
   String appBarTitle() {
@@ -80,12 +91,7 @@ class _TournamentSettingsScreenState
                     items: items.map<DropdownMenuItem<String>>((String item) {
                       return DropdownMenuItem(
                         value: item,
-                        child: Center(
-                          child: Text(
-                            item,
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
+                        child: Text(item),
                       );
                     }).toList(),
                     // After selecting the desired option,it will
@@ -124,7 +130,7 @@ class _TournamentSettingsScreenState
                   child: BaseInputIncrement(
                     onChanged: onGameTimeCounterChanged,
                     maxValue: 60,
-                    startValue: 10,
+                    startValue: int.parse(widget.currentSettings.timePerMatch!),
                   ),
                 ),
               ),
@@ -151,8 +157,11 @@ class _TournamentSettingsScreenState
                 width: 65.w,
                 child: Padding(
                   padding: EdgeInsets.all(4.w),
-                  child:
-                      BaseInputIncrement(onChanged: onIncrementCounterChanged),
+                  child: BaseInputIncrement(
+                    onChanged: onIncrementCounterChanged,
+                    minValue: 0,
+                    startValue: int.parse(widget.currentSettings.increment!),
+                  ),
                 ),
               ),
             ],

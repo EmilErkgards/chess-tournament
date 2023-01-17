@@ -36,15 +36,9 @@ class ChessUser {
 }
 
 class ChessUserService {
-  static late final FirebaseFirestore firebaseInstance;
-
-  static void init(FirebaseFirestore instance) {
-    firebaseInstance = instance;
-  }
-
   static Future<DocumentReference<Map<String, dynamic>>> addUserToDB(
       ChessUser user) async {
-    return await firebaseInstance.collection('users').add({
+    return await FirebaseFirestore.instance.collection('users').add({
       "userId": user.userId,
       "name": user.name,
       "rating": user.rating,
@@ -56,59 +50,40 @@ class ChessUserService {
   static Future<ChessUser?> getUserById(String id) async {
     //TODO Maybe filter this serverside
     ChessUser? returnVal;
-    await firebaseInstance
-        .collection('users')
-        .get()
-        .then(
-          (value) => value.docs.forEach(
-            (doc) {
-              if (doc.data()["id"] == id) {
-                returnVal = ChessUser.fromJSON(doc.data(), id);
-              }
-            },
-          ),
-        )
-        .catchError(onError);
+    var users = await FirebaseFirestore.instance.collection('users').get();
+    users.docs.forEach(
+      (doc) {
+        if (doc.data()["id"] == id) {
+          returnVal = ChessUser.fromJSON(doc.data(), id);
+        }
+      },
+    );
     return returnVal;
   }
 
   static Future<ChessUser?> getUserByName(String name) async {
     //TODO Maybe filter this serverside
     ChessUser? returnVal;
-    firebaseInstance
-        .collection('users')
-        .get()
-        .then(
-          (value) => value.docs.forEach(
-            (element) {
-              if (element.data()["name"] == name) {
-                returnVal = ChessUser.fromJSON(element.data(), element.id);
-              }
-            },
-          ),
-        )
-        .catchError(onError);
+    var users = await FirebaseFirestore.instance.collection('users').get();
+
+    users.docs.forEach((element) {
+      if (element.data()["name"] == name) {
+        returnVal = ChessUser.fromJSON(element.data(), element.id);
+      }
+    });
     return returnVal;
   }
 
   static Future<ChessUser?> getChessUserByUUID(String uuid) async {
     //TODO Maybe filter this serverside
     ChessUser? returnVal;
-    try {
-      await firebaseInstance
-          .collection('users')
-          .get()
-          .then((value) => value.docs.forEach(
-                (doc) {
-                  if (doc.data()["userId"] == uuid) {
-                    returnVal = ChessUser.fromJSON(doc.data(), doc.id);
-                  }
-                },
-              ))
-          .catchError(onError);
-    } catch (error) {
-      print(error.toString());
-    }
+    var users = await FirebaseFirestore.instance.collection('users').get();
+
+    users.docs.forEach((element) {
+      if (element.data()["userId"] == uuid) {
+        returnVal = ChessUser.fromJSON(element.data(), element.id);
+      }
+    });
     return returnVal;
   }
 
@@ -137,7 +112,8 @@ class ChessUserService {
           ChessUser user = ChessUser(
               name: userName,
               rating: jsonS["chess_rapid"]["last"]["rating"].toString(),
-              avatarUrl: avatarUrl);
+              avatarUrl: avatarUrl,
+              tournamentCode: "");
           return user;
         } catch (error) {
           rethrow;

@@ -13,7 +13,7 @@ class TournamentSettings {
     required this.timePerMatch,
   });
 
-  Future<TournamentSettings> fromJSON(
+  static Future<TournamentSettings> fromJSON(
       Map<String, dynamic> snapshot, String docId) async {
     var format = snapshot["format"];
     var increment = snapshot["increment"];
@@ -46,5 +46,30 @@ class TournamentSettingsService {
         });
       });
     });
+  }
+
+  static Future<TournamentSettings> getTournamentSettings(
+      String tournamentCode) async {
+    String settingsDocId = "";
+
+    var instance = FirebaseFirestore.instance;
+    var firebaseResponse = await instance.collection('tournaments').get();
+    firebaseResponse.docs.forEach((element) {
+      if (element.data()["code"] == tournamentCode) {
+        settingsDocId = element.data()["settings"];
+      }
+    });
+
+    QueryDocumentSnapshot<Map<String, dynamic>>? response;
+
+    await instance.collection('tournamentSettings').get().then((value) => {
+          value.docs.forEach((element) {
+            if (element.id == settingsDocId) {
+              response = element;
+            }
+          })
+        });
+
+    return TournamentSettings.fromJSON(response!.data(), response!.id);
   }
 }

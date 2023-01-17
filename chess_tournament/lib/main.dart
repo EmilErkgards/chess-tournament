@@ -20,7 +20,6 @@ void main() async {
       projectId: "chesstournamentplanner",
     ),
   );
-  ChessUserService.init(FirebaseFirestore.instance);
   runApp(MyApp());
 }
 

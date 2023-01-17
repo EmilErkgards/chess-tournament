@@ -2,11 +2,13 @@ import 'dart:async';
 
 import 'package:chess_tournament/src/backend/backend_file.dart';
 import 'package:chess_tournament/src/backend/tournament_service.dart';
+import 'package:chess_tournament/src/backend/tournament_settings_service.dart';
 import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:chess_tournament/src/frontend/common/base_button.dart';
 import 'package:chess_tournament/src/frontend/pages/tournament_overview.dart';
 import 'package:chess_tournament/src/frontend/pages/tournament_settings.dart';
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 class TournamentLobbyScreen extends BasePageScreen {
   final String tournamentCode;
@@ -92,11 +94,15 @@ class TournamentLobbyScreenState
     );
   }
 
-  void openTournamentSettings() {
+  void openTournamentSettings() async {
+    TournamentSettings settings =
+        await TournamentSettingsService.getTournamentSettings(
+            widget.tournamentCode);
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => TournamentSettingsScreen(
           tournamentCode: widget.tournamentCode,
+          currentSettings: settings,
         ),
       ),
     );
@@ -116,29 +122,29 @@ class TournamentLobbyScreenState
   Widget body(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.all(2.w),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+              padding: EdgeInsets.fromLTRB(0, 0, 0, 2.h),
               child: SizedBox(
-                width: 400,
+                width: 90.w,
                 child: Card(
                   child: Padding(
-                    padding: const EdgeInsets.all(8),
+                    padding: EdgeInsets.all(2.w),
                     child: Column(
                       children: [
-                        const Text(
+                        Text(
                           "Tournament Code",
                           style: TextStyle(
-                            fontSize: 25,
+                            fontSize: 20.sp,
                           ),
                         ),
                         Text(
                           widget.tournamentCode,
-                          style: const TextStyle(
-                            fontSize: 20,
+                          style: TextStyle(
+                            fontSize: 15.sp,
                           ),
                         ),
                       ],
@@ -147,16 +153,16 @@ class TournamentLobbyScreenState
                 ),
               ),
             ),
-            const SizedBox(
-              width: 400,
+            SizedBox(
+              width: 90.w,
               child: Card(
                 child: Padding(
-                  padding: EdgeInsets.all(8),
+                  padding: EdgeInsets.all(2.w),
                   child: Text(
                     "Participants",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 15.sp,
                     ),
                   ),
                 ),
@@ -221,7 +227,7 @@ class TournamentLobbyScreenState
           );
         } else {
           return SizedBox(
-            width: 400,
+            width: 90.w,
             child: ListView.builder(
               shrinkWrap: true,
               itemCount: snapshot.data!.length,
@@ -242,10 +248,10 @@ class TournamentLobbyScreenState
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(2.w),
               child: SizedBox(
-                width: 50,
-                height: 50,
+                width: 10.w,
+                height: 10.w,
                 child:
                     ChessUserService.getAvatarFromUrl(participant.avatarUrl!),
               ),

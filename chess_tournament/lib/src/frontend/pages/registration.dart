@@ -143,11 +143,11 @@ class _RegistrationScreenState extends BasePageScreenState<RegistrationScreen>
       showSpinner = true;
     });
     try {
-      ChessUser user =
-          await ChessUserService.createChessUser(chessUsernameController.text);
-
       final newUser = await _auth.createUserWithEmailAndPassword(
           email: emailController.text, password: passwordController.text);
+
+      ChessUser user =
+          await ChessUserService.createChessUser(chessUsernameController.text);
 
       user.userId = newUser.user!.uid;
       user.docId = (await ChessUserService.addUserToDB(user)).id;
