@@ -34,47 +34,56 @@ class TournamentSettings {
 class TournamentSettingsService {
   static Future<void> setTournamentSettings(
       String tournamentCode, TournamentSettings settings) async {
-    var tournamentSettingsId = await FirebaseFirestore.instance
-        .collection("tournaments")
-        .where('code', isEqualTo: tournamentCode)
-        .get()
-        .then((value) async {
-      value.docs.forEach((element) {
-        FirebaseFirestore.instance
-            .collection('tournamentSettings')
-            .doc(element.data()["settings"])
-            .update({
-          "format": settings.format,
-          "increment": settings.increment,
-          "totalTime": settings.totalTime,
-          "evenTimeSplit": settings.evenTimeSplit,
+    try {
+      var tournamentSettingsId = await FirebaseFirestore.instance
+          .collection("tournaments")
+          .where('code', isEqualTo: tournamentCode)
+          .get()
+          .then((value) async {
+        value.docs.forEach((element) {
+          FirebaseFirestore.instance
+              .collection('tournamentSettings')
+              .doc(element.data()["settings"])
+              .update({
+            "format": settings.format,
+            "increment": settings.increment,
+            "totalTime": settings.totalTime,
+            "evenTimeSplit": settings.evenTimeSplit,
+          });
         });
       });
-    });
+    } catch (error) {
+      print("setTournamentSettings" + error.toString());
+    }
   }
 
   static Future<TournamentSettings> getTournamentSettings(
       String tournamentCode) async {
-    String settingsDocId = "";
+    var response;
 
     var instance = FirebaseFirestore.instance;
-    var firebaseResponse = await instance.collection('tournaments').get();
-    firebaseResponse.docs.forEach((element) {
-      if (element.data()["code"] == tournamentCode) {
-        settingsDocId = element.data()["settings"];
-      }
-    });
+    try {
+      await instance.collection('tournaments').get().then((value) => {
+            value.docs.forEach((element) async {
+              if (element.data()["code"].toString() == tournamentCode) {
+                var collection = instance.collection('tournamentSettings');
 
-    QueryDocumentSnapshot<Map<String, dynamic>>? response;
+                //TODO: THIS LINE CRASHES: WHYWRY WHAUID HWQY/UD HASYK
+                var firebaseResponse = await collection.get();
 
-    await instance.collection('tournamentSettings').get().then((value) => {
-          value.docs.forEach((element) {
-            if (element.id == settingsDocId) {
-              response = element;
-            }
-          })
-        });
+                var settingsId = element.data()["settings"].toString();
+                firebaseResponse.docs.forEach((element2) {
+                  if (element2.id == settingsId) {
+                    response = element2;
+                  }
+                });
+              }
+            })
+          });
+    } catch (error) {
+      print("getTournamentSettings" + error.toString());
+    }
 
-    return TournamentSettings.fromJSON(response!.data(), response!.id);
+    return await TournamentSettings.fromJSON(response.data(), response.id);
   }
 }

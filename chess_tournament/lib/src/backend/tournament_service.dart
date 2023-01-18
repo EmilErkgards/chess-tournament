@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:chess_tournament/src/backend/backend_file.dart';
 import 'package:chess_tournament/src/backend/match_service.dart';
+import 'package:chess_tournament/src/backend/tournament_settings_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -21,12 +22,12 @@ class Tournament {
     required this.owner,
   });
 
-  Future<Tournament> fromJSON(
+  static Future<Tournament> fromJSON(
       Map<String, dynamic> snapshot, String docId) async {
     var code = snapshot["code"];
     var state = snapshot["state"];
     var settings = snapshot["settings"];
-    var owner = await ChessUserService.getUserById(snapshot["black"]);
+    var owner = await ChessUserService.getUserById(snapshot["owner"]);
     return Tournament(
         docId: docId,
         code: code,
@@ -37,16 +38,39 @@ class Tournament {
 }
 
 class TournamentService {
+  static Future<Tournament> getTournamentByCode(String tournamentCode) async {
+    Tournament? tournament;
+    try {
+      await FirebaseFirestore.instance
+          .collection("tournaments")
+          .get()
+          .then((value) {
+        value.docs.forEach((element) async {
+          if (element.data()["code"] == tournamentCode) {
+            tournament = await Tournament.fromJSON(element.data(), element.id);
+          }
+        });
+      });
+    } catch (error) {
+      print(error);
+    }
+    return tournament!;
+  }
+
   static Future<List<ChessUser>> getTournamentParticipants(
       BuildContext context, String tournamentCode) async {
     List<ChessUser> participants = List.empty(growable: true);
-    var firebaseResponse =
-        await FirebaseFirestore.instance.collection('users').get();
+    try {
+      var firebaseResponse =
+          await FirebaseFirestore.instance.collection('users').get();
 
-    firebaseResponse.docs.forEach(
-        (doc) => participants.add(ChessUser.fromJSON(doc.data(), doc.id)));
-    participants
-        .removeWhere((element) => element.tournamentCode != tournamentCode);
+      firebaseResponse.docs.forEach(
+          (doc) => participants.add(ChessUser.fromJSON(doc.data(), doc.id)));
+      participants
+          .removeWhere((element) => element.tournamentCode != tournamentCode);
+    } catch (error) {
+      print(error);
+    }
     return participants;
   }
 
@@ -56,28 +80,39 @@ class TournamentService {
 
   static Future<bool> codeExistsInDB(String code) async {
     bool retVal = false;
-    var firebaseResponse =
-        await FirebaseFirestore.instance.collection('tournaments').get();
-    firebaseResponse.docs.forEach(
-      (doc) {
-        if (doc.data()["code"].toString() == code) {
-          retVal = true;
-        }
-      },
-    );
+    try {
+      var firebaseResponse =
+          await FirebaseFirestore.instance.collection('tournaments').get();
+      firebaseResponse.docs.forEach(
+        (doc) {
+          if (doc.data()["code"].toString() == code) {
+            retVal = true;
+          }
+        },
+      );
+    } catch (error) {
+      print(error);
+    }
     return retVal;
   }
 
   static Future<String> createDefaultTournamentSettings() async {
-    var docRef =
-        await FirebaseFirestore.instance.collection('tournamentSettings').add({
-      "format": "roundRobin",
-      "totalTime": 10,
-      "increment": 1,
-      "evenTimeSplit": true,
-    });
+    String? id;
+    try {
+      id = (await FirebaseFirestore.instance
+              .collection('tournamentSettings')
+              .add({
+        "format": "roundRobin",
+        "totalTime": 10,
+        "increment": 1,
+        "evenTimeSplit": true,
+      }))
+          .id;
+    } catch (error) {
+      print("createDefaultTournamentSettings" + error.toString());
+    }
 
-    return docRef.id;
+    return id!;
   }
 
   static Future<String> addTournament(ChessUser owner) async {
@@ -87,13 +122,16 @@ class TournamentService {
     }
 
     var settingsDocRef = await createDefaultTournamentSettings();
-
-    FirebaseFirestore.instance.collection('tournaments').add({
-      "code": code.toString(),
-      "state": "notStarted",
-      "settings": settingsDocRef,
-      "owner": owner.docId
-    });
+    try {
+      FirebaseFirestore.instance.collection('tournaments').add({
+        "code": code.toString(),
+        "state": "notStarted",
+        "settings": settingsDocRef,
+        "owner": owner.docId
+      });
+    } catch (error) {
+      print("addTournament" + error.toString());
+    }
 
     return code.toString();
   }
@@ -115,7 +153,7 @@ class TournamentService {
           .doc(chessUser.docId)
           .update({"tournamentCode": code});
     } catch (error) {
-      rethrow;
+      print("addUserToTournament" + error.toString());
     }
     return true;
   }
@@ -123,45 +161,54 @@ class TournamentService {
   static Future<bool> isTournamentOwner(
       ChessUser user, String tournamentCode) async {
     var retVal = false;
-    await FirebaseFirestore.instance
-        .collection('tournaments')
-        .get()
-        .then((value) => {
-              value.docs.forEach((element) {
-                if (element.data()["code"] == tournamentCode &&
-                    element.data()["owner"] == user.docId) {
-                  retVal = true;
-                }
-              })
-            });
+    try {
+      await FirebaseFirestore.instance
+          .collection('tournaments')
+          .get()
+          .then((value) => {
+                value.docs.forEach((element) {
+                  if (element.data()["code"] == tournamentCode &&
+                      element.data()["owner"] == user.docId) {
+                    retVal = true;
+                  }
+                })
+              });
+    } catch (error) {
+      print("isTournamentOwner" + error.toString());
+    }
 
     return retVal;
   }
 
   static Future<bool> isTournamentStarted(String tournamentCode) async {
     var retVal = false;
-    await FirebaseFirestore.instance
-        .collection('tournaments')
-        .get()
-        .then((value) => {
-              value.docs.forEach((element) {
-                if (element.data()["code"] == tournamentCode &&
-                    element.data()["state"] == "started") {
-                  retVal = true;
-                }
-              })
-            });
+    try {
+      await FirebaseFirestore.instance
+          .collection('tournaments')
+          .get()
+          .then((value) => {
+                value.docs.forEach((element) {
+                  if (element.data()["code"] == tournamentCode &&
+                      element.data()["state"] == "started") {
+                    retVal = true;
+                  }
+                })
+              });
+    } catch (error) {
+      print("isTournamentStarted" + error.toString());
+    }
 
     return retVal;
   }
 
-  static List<ChessMatch?> generateRoundRobin(
-      List<ChessUser> participants, int totalTime, bool evenTimeSplit) {
+  static Future<List<ChessMatch?>> generateRoundRobin(
+      List<ChessUser> participants,
+      TournamentSettings settings,
+      String tournamentCode) async {
     int numberOfRounds = participants.length - 1;
     if (participants.length % 2 != 0) {
       numberOfRounds = participants.length;
     }
-
     List<ChessMatch?> matches =
         List.filled(numberOfRounds * (participants.length / 2).ceil(), null);
 
@@ -178,12 +225,13 @@ class TournamentService {
           white = participants[j];
           black = participants[i];
         }
-        double whiteTime = totalTime / 2;
-        double blackTime = totalTime / 2;
-        if (!evenTimeSplit) {
+        double whiteTime = settings.totalTime! / 2;
+        double blackTime = settings.totalTime! / 2;
+        if (!settings.evenTimeSplit!) {
           //Call algorithm
         }
         matches[index++] = (ChessMatch(
+            tournamentCode: tournamentCode,
             white: white,
             black: black,
             whiteTime: whiteTime,
@@ -193,6 +241,42 @@ class TournamentService {
     }
 
     return matches;
+  }
+
+  static Future<void> setTournamentMatches(List<ChessMatch?> matches) async {
+    // try {
+    //   await FirebaseFirestore.instance
+    //       .collection('matches')
+    //       .get()
+    //       .then((value) async => {
+    //             value.docs.forEach((element) {
+    //               if (element.data()["tournamentCode"] ==
+    //                   matches[0]!.tournamentCode) {
+    //                 FirebaseFirestore.instance
+    //                     .runTransaction((Transaction myTransaction) async {
+    //                   myTransaction.delete(element.reference);
+    //                 });
+    //               }
+    //             })
+    //           });
+    // } catch (error) {
+    //   print("setTournamentMatches" + error.toString());
+    // }
+    for (int i = 0; i < matches.length; i++) {
+      ChessMatch match = matches[i]!;
+      try {
+        FirebaseFirestore.instance.collection("matches").add({
+          "tournamentCode": match.tournamentCode,
+          "white": match.white,
+          "black": match.black,
+          "whiteTime": match.whiteTime,
+          "blackTime": match.blackTime,
+          "result": match.result,
+        });
+      } catch (error) {
+        print("setTournamentMatches" + error.toString());
+      }
+    }
   }
 
   static Future<void> deleteTournamentSettings(String id) async {
@@ -233,7 +317,7 @@ class TournamentService {
                 })
               });
     } catch (error) {
-      print(error);
+      print("deleteTournament" + error.toString());
     }
 
     try {
@@ -250,7 +334,7 @@ class TournamentService {
         });
       });
     } catch (error) {
-      print(error);
+      print("deleteTournament" + error.toString());
     }
   }
 
@@ -270,7 +354,7 @@ class TournamentService {
         });
       });
     } catch (error) {
-      print(error);
+      print("leaveTournament" + error.toString());
     }
   }
 }

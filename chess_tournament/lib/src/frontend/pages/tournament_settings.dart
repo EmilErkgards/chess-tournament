@@ -231,6 +231,39 @@ class _TournamentSettingsScreenState
               )
             ],
           ),
+          Row(
+            //TODO: detta vart sisådär
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: isMobile ? 35.w : 20.w,
+                child: Padding(
+                  padding: EdgeInsets.all(4.w),
+                  child: Text(
+                    "Split time evenly",
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w100,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 65.w,
+                child: Padding(
+                    padding: EdgeInsets.all(4.w),
+                    child: Switch(
+                      value: evenTimeSplit,
+                      onChanged: (value) {
+                        setState(() {
+                          evenTimeSplit = value;
+                        });
+                      },
+                    )),
+              ),
+            ],
+          ),
           BaseButton(
             text: 'Apply',
             callback: onApply,

@@ -37,7 +37,7 @@ class TournamentLobbyScreenState
     super.initState();
     participants = TournamentService.getTournamentParticipants(
         context, widget.tournamentCode);
-    setUpTimedFetch();
+    // setUpTimedFetch();
   }
 
   @override
@@ -69,13 +69,12 @@ class TournamentLobbyScreenState
 
   void startTournament() async {
     //TODO start tournament
+    var settings = await TournamentSettingsService.getTournamentSettings(
+        widget.tournamentCode);
     var participants = await TournamentService.getTournamentParticipants(
         context, widget.tournamentCode);
-    TournamentSettings settings =
-        await TournamentSettingsService.getTournamentSettings(
-            widget.tournamentCode);
-    var x = TournamentService.generateRoundRobin(
-        participants, settings.totalTime!, settings.evenTimeSplit!);
+    var x = await TournamentService.generateRoundRobin(
+        participants, settings, widget.tournamentCode);
     for (int i = 0; i < x.length; i++) {
       print(i.toString() +
           ": " +
@@ -83,6 +82,8 @@ class TournamentLobbyScreenState
           " vs " +
           x[i]!.black!.userId!);
     }
+
+    TournamentService.setTournamentMatches(x);
     // Navigator.of(context).push(
     //   MaterialPageRoute(
     //     builder: (context) => const TournamentOverviewScreen(),
@@ -174,7 +175,10 @@ class TournamentLobbyScreenState
             ),
             Expanded(
               flex: 7,
-              child: participantList(context),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(0, 0, 0, 1.h),
+                child: participantList(context),
+              ),
             ),
             if (widget.isStarted) ...{
               Padding(
@@ -255,13 +259,30 @@ class TournamentLobbyScreenState
               padding: EdgeInsets.all(2.w),
               child: SizedBox(
                 width: 10.w,
-                height: 10.w,
+                height: 4.h,
                 child:
                     ChessUserService.getAvatarFromUrl(participant.avatarUrl!),
               ),
             ),
-            Text(participant.name!),
-            Text("Rating: " + participant.rating!),
+            SizedBox(
+              width: 40.w,
+              height: 4.h,
+              child: Center(child: Text(participant.name!)),
+            ),
+            SizedBox(
+              width: 12.w,
+              height: 4.h,
+              child: const Center(
+                child: Text("Rating:"),
+              ),
+            ),
+            SizedBox(
+              width: 8.w,
+              height: 4.h,
+              child: Center(
+                child: Text(participant.rating!),
+              ),
+            ),
           ],
         ),
       ),

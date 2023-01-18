@@ -50,40 +50,52 @@ class ChessUserService {
   static Future<ChessUser?> getUserById(String id) async {
     //TODO Maybe filter this serverside
     ChessUser? returnVal;
-    var users = await FirebaseFirestore.instance.collection('users').get();
-    users.docs.forEach(
-      (doc) {
-        if (doc.data()["id"] == id) {
-          returnVal = ChessUser.fromJSON(doc.data(), id);
-        }
-      },
-    );
+    try {
+      var users = await FirebaseFirestore.instance.collection('users').get();
+      users.docs.forEach(
+        (doc) {
+          if (doc.data()["id"] == id) {
+            returnVal = ChessUser.fromJSON(doc.data(), id);
+          }
+        },
+      );
+    } catch (error) {
+      print("getUserById" + error.toString());
+    }
     return returnVal;
   }
 
   static Future<ChessUser?> getUserByName(String name) async {
     //TODO Maybe filter this serverside
     ChessUser? returnVal;
-    var users = await FirebaseFirestore.instance.collection('users').get();
+    try {
+      var users = await FirebaseFirestore.instance.collection('users').get();
 
-    users.docs.forEach((element) {
-      if (element.data()["name"] == name) {
-        returnVal = ChessUser.fromJSON(element.data(), element.id);
-      }
-    });
+      users.docs.forEach((element) {
+        if (element.data()["name"] == name) {
+          returnVal = ChessUser.fromJSON(element.data(), element.id);
+        }
+      });
+    } catch (error) {
+      print("getUserByName" + error.toString());
+    }
     return returnVal;
   }
 
   static Future<ChessUser?> getChessUserByUUID(String uuid) async {
     //TODO Maybe filter this serverside
     ChessUser? returnVal;
-    var users = await FirebaseFirestore.instance.collection('users').get();
+    try {
+      var users = await FirebaseFirestore.instance.collection('users').get();
 
-    users.docs.forEach((element) {
-      if (element.data()["userId"] == uuid) {
-        returnVal = ChessUser.fromJSON(element.data(), element.id);
-      }
-    });
+      users.docs.forEach((element) {
+        if (element.data()["userId"] == uuid) {
+          returnVal = ChessUser.fromJSON(element.data(), element.id);
+        }
+      });
+    } catch (error) {
+      print("getChessUserByUUID" + error.toString());
+    }
     return returnVal;
   }
 

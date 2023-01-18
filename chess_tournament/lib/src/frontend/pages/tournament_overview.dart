@@ -62,6 +62,7 @@ class _TournamentOverviewScreenState
   late List<ChessMatch> matches = [
     ChessMatch(
         docId: '',
+        tournamentCode: "",
         white: participants[0],
         black: participants[1],
         whiteTime: 300,
@@ -69,6 +70,7 @@ class _TournamentOverviewScreenState
         result: "notStarted"),
     ChessMatch(
         docId: '',
+        tournamentCode: "",
         white: participants[2],
         black: participants[3],
         whiteTime: 300,
@@ -76,6 +78,7 @@ class _TournamentOverviewScreenState
         result: "notStarted"),
     ChessMatch(
         docId: '',
+        tournamentCode: "",
         white: participants[4],
         black: participants[2],
         whiteTime: 300,
@@ -83,6 +86,7 @@ class _TournamentOverviewScreenState
         result: "notStarted"),
     ChessMatch(
         docId: '',
+        tournamentCode: "",
         white: participants[3],
         black: participants[1],
         whiteTime: 300,
