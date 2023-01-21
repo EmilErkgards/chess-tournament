@@ -46,15 +46,15 @@ class ChessUserService {
     });
   }
 
-  static Future<ChessUser?> getUserById(String id) async {
+  static Future<ChessUser?> getUserByDocId(String docId) async {
     //TODO Maybe filter this serverside
     ChessUser? returnVal;
     try {
       var users = await FirebaseFirestore.instance.collection('users').get();
       users.docs.forEach(
         (doc) {
-          if (doc.data()["id"] == id) {
-            returnVal = ChessUser.fromJSON(doc.data(), id);
+          if (doc.id == docId) {
+            returnVal = ChessUser.fromJSON(doc.data(), doc.id);
           }
         },
       );
@@ -81,14 +81,14 @@ class ChessUserService {
     return returnVal;
   }
 
-  static Future<ChessUser?> getChessUserByUUID(String uuid) async {
+  static Future<ChessUser?> getChessUserByUserId(String userId) async {
     //TODO Maybe filter this serverside
     ChessUser? returnVal;
     try {
       var users = await FirebaseFirestore.instance.collection('users').get();
 
       users.docs.forEach((element) {
-        if (element.data()["userId"] == uuid) {
+        if (element.data()["userId"] == userId) {
           returnVal = ChessUser.fromJSON(element.data(), element.id);
         }
       });

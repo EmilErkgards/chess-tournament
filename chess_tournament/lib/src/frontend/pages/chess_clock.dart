@@ -81,6 +81,7 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
                           blacksTime.toString(),
                           style: const TextStyle(
                             fontSize: 100,
+                            color: Colors.grey,
                           ),
                         ),
                       ),
@@ -132,6 +133,7 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
                           whitesTime.toString(),
                           style: const TextStyle(
                             fontSize: 100,
+                            color: Colors.black,
                           ),
                         ),
                       ),

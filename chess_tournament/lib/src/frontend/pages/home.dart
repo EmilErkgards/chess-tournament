@@ -33,7 +33,7 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
         Navigator.pushNamed(context, 'welcome_screen');
       } else {
         var currUser =
-            await ChessUserService.getChessUserByUUID(currentUser.uid);
+            await ChessUserService.getChessUserByUserId(currentUser.uid);
         if (currUser!.tournamentCode != "") {
           bool isOwner = await TournamentService.isTournamentOwner(
               currUser, currUser.tournamentCode!);
@@ -117,7 +117,7 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
     User? currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) throw "Not logged in";
 
-    var owner = await ChessUserService.getChessUserByUUID(currentUser.uid);
+    var owner = await ChessUserService.getChessUserByUserId(currentUser.uid);
     String code = await TournamentService.addTournament(owner!);
     await TournamentService.addUserToTournament(currentUser, code);
     Navigator.of(context).push(
@@ -139,7 +139,7 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
     User? currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) throw "Not logged in";
 
-    var currUser = await ChessUserService.getChessUserByUUID(currentUser.uid);
+    var currUser = await ChessUserService.getChessUserByUserId(currentUser.uid);
 
     if (formKey.currentState!.validate() &&
         await TournamentService.addUserToTournament(currentUser, value)) {

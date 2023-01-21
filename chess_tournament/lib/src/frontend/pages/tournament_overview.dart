@@ -1,12 +1,20 @@
+import 'package:chess_tournament/src/backend/dark_theme.dart';
 import 'package:chess_tournament/src/backend/match_service.dart';
+import 'package:chess_tournament/src/backend/tournament_service.dart';
 import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:chess_tournament/src/frontend/pages/chess_clock.dart';
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 import '../../backend/backend_file.dart';
 
 class TournamentOverviewScreen extends BasePageScreen {
-  const TournamentOverviewScreen({super.key});
+  final String tournamentCode;
+
+  const TournamentOverviewScreen({
+    super.key,
+    required this.tournamentCode,
+  });
 
   @override
   State<TournamentOverviewScreen> createState() =>
@@ -15,9 +23,12 @@ class TournamentOverviewScreen extends BasePageScreen {
 
 class _TournamentOverviewScreenState
     extends BasePageScreenState<TournamentOverviewScreen> with BaseScreen {
+  Future<List<ChessMatch>>? matches;
+
   @override
   void initState() {
     super.initState();
+    matches = TournamentService.getTournamentMatches(widget.tournamentCode);
   }
 
   @override
@@ -32,13 +43,16 @@ class _TournamentOverviewScreenState
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(40),
-            child: minimizedLeaderBoard(),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(80),
-            child: matchesToPlay(),
+          // Padding(
+          //   padding: const EdgeInsets.all(40),
+          //   child: minimizedLeaderBoard(),
+          // ),
+          Expanded(
+            flex: 7,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(0, 0, 0, 1.h),
+              child: matchesToPlay(context),
+            ),
           ),
         ],
       ),
@@ -53,68 +67,27 @@ class _TournamentOverviewScreenState
     ChessUser(name: "Anton", rating: "1337", userId: "bla"),
   ];
 
-  late List<ChessUser> topThree = [
-    participants[0],
-    participants[3],
-    participants[4],
-  ];
-
-  late List<ChessMatch> matches = [
-    ChessMatch(
-        docId: '',
-        tournamentCode: "",
-        white: participants[0],
-        black: participants[1],
-        whiteTime: 300,
-        blackTime: 300,
-        result: "notStarted"),
-    ChessMatch(
-        docId: '',
-        tournamentCode: "",
-        white: participants[2],
-        black: participants[3],
-        whiteTime: 300,
-        blackTime: 300,
-        result: "notStarted"),
-    ChessMatch(
-        docId: '',
-        tournamentCode: "",
-        white: participants[4],
-        black: participants[2],
-        whiteTime: 300,
-        blackTime: 300,
-        result: "notStarted"),
-    ChessMatch(
-        docId: '',
-        tournamentCode: "",
-        white: participants[3],
-        black: participants[1],
-        whiteTime: 300,
-        blackTime: 300,
-        result: "notStarted"),
-  ];
-
-  Widget minimizedLeaderBoard() {
-    return ListView(
-      shrinkWrap: true,
-      children: topThree.map((participant) {
-        return Center(
-          child: SizedBox(
-            width: 400,
-            height: 60,
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(
-                  child: leaderBoardCard(participant),
-                ),
-              ),
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
+  // Widget minimizedLeaderBoard() {
+  //   return ListView(
+  //     shrinkWrap: true,
+  //     children: topThree.map((participant) {
+  //       return Center(
+  //         child: SizedBox(
+  //           width: 400,
+  //           height: 60,
+  //           child: Card(
+  //             child: Padding(
+  //               padding: const EdgeInsets.all(8.0),
+  //               child: Center(
+  //                 child: leaderBoardCard(participant),
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //       );
+  //     }).toList(),
+  //   );
+  // }
 
   Widget leaderBoardCard(ChessUser participant) {
     return Row(
@@ -126,64 +99,121 @@ class _TournamentOverviewScreenState
     );
   }
 
-  Widget matchesToPlay() {
-    return ListView(
-      shrinkWrap: true,
-      children: matches.map((match) {
-        return Center(
-          child: SizedBox(
-            width: 400,
-            height: 100,
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: matchCard(match),
-              ),
+  Widget matchesToPlay(BuildContext context) {
+    return FutureBuilder(
+      future: matches,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else {
+          return SizedBox(
+            width: 80.w,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                return matchCard(snapshot.data![index]);
+              },
             ),
-          ),
-        );
-      }).toList(),
+          );
+        }
+      },
     );
   }
 
   Widget matchCard(ChessMatch match) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Expanded(
-          flex: 1,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text(match.white!.name!),
-              Text("Rating: " + match.white!.rating.toString()),
-            ],
-          ),
-        ),
-        Expanded(
-          flex: 1,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text("VS"),
-              ElevatedButton(
-                onPressed: () => startMatch(match),
-                child: Text("Start"),
+    return Card(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Expanded(
+            flex: 1,
+            child: Padding(
+              padding: EdgeInsets.all(2.w),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  SizedBox(
+                    width: 10.w,
+                    height: 4.h,
+                    child: ChessUserService.getAvatarFromUrl(
+                        match.white!.avatarUrl!),
+                  ),
+                  Text(
+                    match.white!.name!,
+                    style: TextStyle(
+                      fontSize: 9.sp,
+                    ),
+                  ),
+                  Text(
+                    "Rating: " + match.white!.rating.toString(),
+                    style: TextStyle(
+                      fontSize: 9.sp,
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-        Expanded(
-          flex: 1,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text(match.black!.name!),
-              Text("Rating: " + match.black!.rating.toString()),
-            ],
+          Expanded(
+            flex: 1,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(.5.w),
+                  child: Text(
+                    "VS",
+                    style: TextStyle(
+                      fontSize: 9.sp,
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () => startMatch(match),
+                  child: Text(
+                    "Start",
+                    style: TextStyle(
+                      fontSize: 9.sp,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+          Expanded(
+            flex: 1,
+            child: Padding(
+              padding: EdgeInsets.all(2.w),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  SizedBox(
+                    width: 10.w,
+                    height: 4.h,
+                    child: ChessUserService.getAvatarFromUrl(
+                        match.black!.avatarUrl!),
+                  ),
+                  Text(
+                    match.black!.name!,
+                    style: TextStyle(
+                      fontSize: 9.sp,
+                    ),
+                  ),
+                  Text(
+                    "Rating: " + match.black!.rating.toString(),
+                    style: TextStyle(
+                      fontSize: 9.sp,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

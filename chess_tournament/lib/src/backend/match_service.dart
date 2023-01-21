@@ -21,9 +21,10 @@ class ChessMatch {
     required this.result,
   });
 
-  Future<ChessMatch> fromJSON(Map<String, dynamic> snapshot, String id) async {
-    var white = await ChessUserService.getUserById(snapshot["white"]);
-    var black = await ChessUserService.getUserById(snapshot["black"]);
+  static Future<ChessMatch> fromJSON(
+      Map<String, dynamic> snapshot, String id) async {
+    var white = await ChessUserService.getUserByDocId(snapshot["white"]);
+    var black = await ChessUserService.getUserByDocId(snapshot["black"]);
     var tournamentCode = snapshot["tournamentCode"];
     var whiteTime = snapshot["whiteTime"];
     var blackTime = snapshot["blackTime"];

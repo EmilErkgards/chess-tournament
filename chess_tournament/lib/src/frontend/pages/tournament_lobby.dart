@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:chess_tournament/src/backend/backend_file.dart';
-import 'package:chess_tournament/src/backend/match_service.dart';
 import 'package:chess_tournament/src/backend/tournament_service.dart';
 import 'package:chess_tournament/src/backend/tournament_settings_service.dart';
 import 'package:chess_tournament/src/frontend/base_screen.dart';
@@ -69,17 +68,13 @@ class TournamentLobbyScreenState
 
   void startTournament() async {
     //TODO start tournament
-    var settings = await TournamentSettingsService.getTournamentSettings(
-        widget.tournamentCode);
-    var participants = await TournamentService.getTournamentParticipants(
-        widget.tournamentCode);
-    var x = await TournamentService.generateRoundRobin(
-        participants, settings, widget.tournamentCode);
+    TournamentService.startTournament(
+        widget.tournamentCode, await participants!);
 
-    await TournamentService.setTournamentMatches(x);
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => const TournamentOverviewScreen(),
+        builder: (context) =>
+            TournamentOverviewScreen(tournamentCode: widget.tournamentCode),
       ),
     );
   }
@@ -87,7 +82,8 @@ class TournamentLobbyScreenState
   void goToTournament() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => const TournamentOverviewScreen(),
+        builder: (context) =>
+            TournamentOverviewScreen(tournamentCode: widget.tournamentCode),
       ),
     );
   }
@@ -244,40 +240,37 @@ class TournamentLobbyScreenState
 
   Widget participantCard(ChessUser participant) {
     return Card(
-      child: SizedBox(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Padding(
-              padding: EdgeInsets.all(2.w),
-              child: SizedBox(
-                width: 10.w,
-                height: 4.h,
-                child:
-                    ChessUserService.getAvatarFromUrl(participant.avatarUrl!),
-              ),
-            ),
-            SizedBox(
-              width: 40.w,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Padding(
+            padding: EdgeInsets.all(2.w),
+            child: SizedBox(
+              width: 10.w,
               height: 4.h,
-              child: Center(child: Text(participant.name!)),
+              child: ChessUserService.getAvatarFromUrl(participant.avatarUrl!),
             ),
-            SizedBox(
-              width: 12.w,
-              height: 4.h,
-              child: const Center(
-                child: Text("Rating:"),
-              ),
+          ),
+          SizedBox(
+            width: 40.w,
+            height: 4.h,
+            child: Center(child: Text(participant.name!)),
+          ),
+          SizedBox(
+            width: 12.w,
+            height: 4.h,
+            child: const Center(
+              child: Text("Rating:"),
             ),
-            SizedBox(
-              width: 8.w,
-              height: 4.h,
-              child: Center(
-                child: Text(participant.rating!),
-              ),
+          ),
+          SizedBox(
+            width: 8.w,
+            height: 4.h,
+            child: Center(
+              child: Text(participant.rating!),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

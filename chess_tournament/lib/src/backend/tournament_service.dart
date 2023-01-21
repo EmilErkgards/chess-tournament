@@ -27,7 +27,7 @@ class Tournament {
     var code = snapshot["code"];
     var state = snapshot["state"];
     var settings = snapshot["settings"];
-    var owner = await ChessUserService.getUserById(snapshot["owner"]);
+    var owner = await ChessUserService.getUserByDocId(snapshot["owner"]);
     return Tournament(
         docId: docId,
         code: code,
@@ -143,7 +143,7 @@ class TournamentService {
       return false;
     }
 
-    var chessUser = await ChessUserService.getChessUserByUUID(user.uid);
+    var chessUser = await ChessUserService.getChessUserByUserId(user.uid);
     if (chessUser == null) {
       throw "Could not find chess user with uuid: " + user.uid;
     }
@@ -201,23 +201,47 @@ class TournamentService {
     return retVal;
   }
 
+  static Future<void> startTournament(
+      String tournamentCode, List<ChessUser> participants) async {
+    var settings =
+        await TournamentSettingsService.getTournamentSettings(tournamentCode);
+    var participants =
+        await TournamentService.getTournamentParticipants(tournamentCode);
+    var matches = await TournamentService.generateRoundRobin(
+        participants, settings, tournamentCode);
+
+    await TournamentService.setTournamentMatches(matches);
+
+    var docRef;
+
+    await FirebaseFirestore.instance
+        .collection('tournaments')
+        .get()
+        .then((value) {
+      for (var element in value.docs) {
+        print("bajs");
+        if (element['code'] == tournamentCode) {
+          docRef = element.id;
+        }
+      }
+    });
+    FirebaseFirestore.instance
+        .collection('tournaments')
+        .doc(docRef)
+        .update({"state": "started"});
+  }
+
   static Future<List<ChessMatch>> generateRoundRobin(
       List<ChessUser> participants,
       TournamentSettings settings,
       String tournamentCode) async {
-    int numberOfRounds = participants.length - 1;
-    if (participants.length % 2 != 0) {
-      numberOfRounds = participants.length;
-    }
     List<ChessMatch> matches = List.empty(growable: true);
-
-    int index = 0;
 
     for (int i = 0; i < participants.length; i++) {
       for (int j = i + 1; j < participants.length; j++) {
         ChessUser? white;
         ChessUser? black;
-        if (index % 2 == 0) {
+        if (Random().nextInt(10000) >= 5000) {
           white = participants[i];
           black = participants[j];
         } else {
@@ -273,6 +297,29 @@ class TournamentService {
         print("setTournamentMatches" + error.toString());
       }
     }
+  }
+
+  static Future<List<ChessMatch>> getTournamentMatches(
+      String tournamentCode) async {
+    List<ChessMatch> matches = List.empty(growable: true);
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    ChessUser currUser =
+        (await ChessUserService.getChessUserByUserId(currentUser!.uid))!;
+    try {
+      var response = await FirebaseFirestore.instance
+          .collection('matches')
+          .where('tournamentCode', isEqualTo: tournamentCode)
+          .get();
+      for (var element in response.docs) {
+        if (element["white"] == currUser.docId ||
+            element["black"] == currUser.docId) {
+          matches.add(await ChessMatch.fromJSON(element.data(), element.id));
+        }
+      }
+    } catch (error) {
+      print(error);
+    }
+    return matches;
   }
 
   static Future<void> deleteTournamentSettings(String id) async {
@@ -338,7 +385,7 @@ class TournamentService {
     User? currentUser = FirebaseAuth.instance.currentUser;
     try {
       var currUser =
-          await ChessUserService.getChessUserByUUID(currentUser!.uid);
+          await ChessUserService.getChessUserByUserId(currentUser!.uid);
       FirebaseFirestore.instance.collection('users').get().then((value) async {
         value.docs.forEach((element) {
           if (element.id == currUser!.docId) {
