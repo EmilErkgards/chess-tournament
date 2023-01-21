@@ -35,23 +35,21 @@ class TournamentSettingsService {
   static Future<void> setTournamentSettings(
       String tournamentCode, TournamentSettings settings) async {
     try {
-      var tournamentSettingsId = await FirebaseFirestore.instance
+      var response = await FirebaseFirestore.instance
           .collection("tournaments")
           .where('code', isEqualTo: tournamentCode)
-          .get()
-          .then((value) async {
-        value.docs.forEach((element) {
-          FirebaseFirestore.instance
-              .collection('tournamentSettings')
-              .doc(element.data()["settings"])
-              .update({
-            "format": settings.format,
-            "increment": settings.increment,
-            "totalTime": settings.totalTime,
-            "evenTimeSplit": settings.evenTimeSplit,
-          });
+          .get();
+      for (var tournament in response.docs) {
+        FirebaseFirestore.instance
+            .collection('tournamentSettings')
+            .doc(tournament.data()["settings"])
+            .update({
+          "format": settings.format,
+          "increment": settings.increment,
+          "totalTime": settings.totalTime,
+          "evenTimeSplit": settings.evenTimeSplit,
         });
-      });
+      }
     } catch (error) {
       print("setTournamentSettings" + error.toString());
     }
@@ -59,29 +57,28 @@ class TournamentSettingsService {
 
   static Future<TournamentSettings> getTournamentSettings(
       String tournamentCode) async {
-    var response;
-
     try {
       var instance = FirebaseFirestore.instance;
-      var tournamentCollection = await instance
+      var tournamentResponse = await instance
           .collection('tournaments')
           .where('code', isEqualTo: tournamentCode)
           .get();
-      var tournamentSettingsCollection =
+      var tournamentSettingsResponse =
           await instance.collection('tournamentSettings').get();
 
-      tournamentCollection.docs.forEach((element) {
-        var settingsId = element.data()["settings"].toString();
-        tournamentSettingsCollection.docs.forEach((element2) {
-          if (element2.id == settingsId) {
-            response = element2;
+      for (var tournament in tournamentResponse.docs) {
+        var settingsId = tournament.data()["settings"].toString();
+
+        for (var settings in tournamentSettingsResponse.docs) {
+          if (settings.id == settingsId) {
+            return await TournamentSettings.fromJSON(
+                settings.data(), settings.id);
           }
-        });
-      });
+        }
+      }
     } catch (error) {
       print("getTournamentSettings" + error.toString());
     }
-
-    return await TournamentSettings.fromJSON(response.data(), response.id);
+    throw "tournament not found";
   }
 }

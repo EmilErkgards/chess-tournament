@@ -1,4 +1,12 @@
 import 'package:chess_tournament/src/backend/backend_file.dart';
+import 'package:chess_tournament/src/backend/tournament_service.dart';
+
+enum ChessMatchState {
+  notStarted,
+  whiteWon,
+  blackWon,
+  draw,
+}
 
 class ChessMatch {
   String? docId;
@@ -9,7 +17,7 @@ class ChessMatch {
   double? whiteTime;
   double? blackTime;
 
-  String? result;
+  ChessMatchState? result;
 
   ChessMatch({
     this.docId,
@@ -28,7 +36,7 @@ class ChessMatch {
     var tournamentCode = snapshot["tournamentCode"];
     var whiteTime = snapshot["whiteTime"];
     var blackTime = snapshot["blackTime"];
-    var result = snapshot["result"];
+    var result = ChessMatchService.convertToChessMatchState(snapshot["result"]);
     return ChessMatch(
         docId: id,
         tournamentCode: tournamentCode,
@@ -37,5 +45,11 @@ class ChessMatch {
         whiteTime: whiteTime,
         blackTime: blackTime,
         result: result);
+  }
+}
+
+class ChessMatchService {
+  static ChessMatchState convertToChessMatchState(int number) {
+    return ChessMatchState.values[number];
   }
 }

@@ -218,7 +218,7 @@ class _TournamentOverviewScreenState
   }
 
   void startMatch(ChessMatch match) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => ChessClockScreen()));
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => ChessClockScreen(currentMatch: match)));
   }
 }

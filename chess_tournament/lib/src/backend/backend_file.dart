@@ -70,11 +70,11 @@ class ChessUserService {
     try {
       var users = await FirebaseFirestore.instance.collection('users').get();
 
-      users.docs.forEach((element) {
-        if (element.data()["name"] == name) {
-          returnVal = ChessUser.fromJSON(element.data(), element.id);
+      for (var user in users.docs) {
+        if (user.data()["name"] == name) {
+          returnVal = ChessUser.fromJSON(user.data(), user.id);
         }
-      });
+      }
     } catch (error) {
       print("getUserByName" + error.toString());
     }
@@ -87,11 +87,11 @@ class ChessUserService {
     try {
       var users = await FirebaseFirestore.instance.collection('users').get();
 
-      users.docs.forEach((element) {
-        if (element.data()["userId"] == userId) {
-          returnVal = ChessUser.fromJSON(element.data(), element.id);
+      for (var user in users.docs) {
+        if (user.data()["userId"] == userId) {
+          returnVal = ChessUser.fromJSON(user.data(), user.id);
         }
-      });
+      }
     } catch (error) {
       print("getChessUserByUUID" + error.toString());
     }

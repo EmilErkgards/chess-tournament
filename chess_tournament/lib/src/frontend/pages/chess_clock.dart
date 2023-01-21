@@ -1,12 +1,16 @@
 import 'dart:async';
 
+import 'package:chess_tournament/src/backend/match_service.dart';
 import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class ChessClockScreen extends BasePageScreen {
-  const ChessClockScreen({
+  ChessMatch currentMatch;
+
+  ChessClockScreen({
     super.key,
+    required this.currentMatch,
   });
 
   @override
@@ -29,8 +33,8 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
 
   @override
   void initState() {
-    whitesTimeInMilliSeconds = 5 * 60 * 1000;
-    blacksTimeInMilliSeconds = 5 * 60 * 1000;
+    whitesTimeInMilliSeconds = widget.currentMatch.whiteTime!.toInt() * 1000;
+    blacksTimeInMilliSeconds = widget.currentMatch.blackTime!.toInt() * 1000;
     whitesTime = clockFormat.format(DateTime.fromMillisecondsSinceEpoch(
       whitesTimeInMilliSeconds.toInt(),
     ));
