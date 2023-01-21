@@ -1,5 +1,6 @@
 import 'package:chess_tournament/src/backend/backend_file.dart';
 import 'package:chess_tournament/src/backend/tournament_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum ChessMatchState {
   notStarted,
@@ -51,5 +52,13 @@ class ChessMatch {
 class ChessMatchService {
   static ChessMatchState convertToChessMatchState(int number) {
     return ChessMatchState.values[number];
+  }
+
+  static Future<void> updateMatchResult(
+      ChessMatch match, ChessMatchState state) async {
+    await FirebaseFirestore.instance
+        .collection('matches')
+        .doc(match.docId)
+        .update({"result": state.index});
   }
 }

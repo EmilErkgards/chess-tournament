@@ -211,12 +211,12 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
     });
     if (timeRanOut) {
       if (whitesTimeInMilliSeconds <= 0) {
-        print("Black won on time. Press to continue");
+        ChessMatchService.updateMatchResult(
+            widget.currentMatch, ChessMatchState.blackWon);
       } else {
-        print("Black won on time. Press to continue");
+        ChessMatchService.updateMatchResult(
+            widget.currentMatch, ChessMatchState.whiteWon);
       }
-    } else {
-      print("Someone won. Pick who");
     }
   }
 
@@ -249,21 +249,24 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
           if (!timeRanOut) ...{
             ElevatedButton(
               onPressed: () {
-                registerResult();
+                ChessMatchService.updateMatchResult(
+                    widget.currentMatch, ChessMatchState.whiteWon);
                 Navigator.of(context).pop();
               },
               child: const Text('White Won'),
             ),
             ElevatedButton(
               onPressed: () {
-                registerResult();
+                ChessMatchService.updateMatchResult(
+                    widget.currentMatch, ChessMatchState.draw);
                 Navigator.of(context).pop();
               },
               child: const Text('Draw'),
             ),
             ElevatedButton(
               onPressed: () {
-                registerResult();
+                ChessMatchService.updateMatchResult(
+                    widget.currentMatch, ChessMatchState.blackWon);
                 Navigator.of(context).pop();
               },
               child: const Text('Black Won'),
@@ -272,7 +275,6 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  registerResult();
                   Navigator.of(context).pop();
                 },
                 child: const Text('Continue'),
@@ -283,6 +285,4 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
       ),
     );
   }
-
-  void registerResult() {}
 }

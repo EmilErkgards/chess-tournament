@@ -1,8 +1,8 @@
-import 'package:chess_tournament/src/backend/dark_theme.dart';
 import 'package:chess_tournament/src/backend/match_service.dart';
 import 'package:chess_tournament/src/backend/tournament_service.dart';
 import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:chess_tournament/src/frontend/pages/chess_clock.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
@@ -124,95 +124,181 @@ class _TournamentOverviewScreenState
   }
 
   Widget matchCard(ChessMatch match) {
-    return Card(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Expanded(
-            flex: 1,
-            child: Padding(
-              padding: EdgeInsets.all(2.w),
-              child: Column(
+    Future<ChessUser?> currentUser = ChessUserService.getChessUserByUserId(
+        FirebaseAuth.instance.currentUser!.uid);
+    return FutureBuilder(
+        future: currentUser,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else {
+            return Card(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  SizedBox(
-                    width: 10.w,
-                    height: 4.h,
-                    child: ChessUserService.getAvatarFromUrl(
-                        match.white!.avatarUrl!),
-                  ),
-                  Text(
-                    match.white!.name!,
-                    style: TextStyle(
-                      fontSize: 9.sp,
+                  Expanded(
+                    flex: 1,
+                    child: Padding(
+                      padding: EdgeInsets.all(2.w),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          SizedBox(
+                            width: 10.w,
+                            height: 4.h,
+                            child: ChessUserService.getAvatarFromUrl(
+                                match.white!.avatarUrl!),
+                          ),
+                          Text(
+                            match.white!.name!,
+                            style: TextStyle(
+                              fontSize: 9.sp,
+                            ),
+                          ),
+                          Text(
+                            "Rating: " + match.white!.rating.toString(),
+                            style: TextStyle(
+                              fontSize: 9.sp,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  Text(
-                    "Rating: " + match.white!.rating.toString(),
-                    style: TextStyle(
-                      fontSize: 9.sp,
+                  Expanded(
+                    flex: 1,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(.5.w),
+                          child: Text(
+                            "VS",
+                            style: TextStyle(
+                              fontSize: 9.sp,
+                            ),
+                          ),
+                        ),
+                        if (match.result == ChessMatchState.notStarted) ...{
+                          ElevatedButton(
+                            onPressed: () => startMatch(match),
+                            child: Text(
+                              "Start",
+                              style: TextStyle(
+                                fontSize: 9.sp,
+                              ),
+                            ),
+                          ),
+                        } else if (match.result == ChessMatchState.draw) ...{
+                          drawWidget(),
+                        } else if (match.white!.docId ==
+                            snapshot.data!.docId) ...{
+                          if (match.result == ChessMatchState.whiteWon) ...{
+                            winWidget(),
+                          } else ...{
+                            loseWidget(),
+                          }
+                        } else ...{
+                          if (match.result == ChessMatchState.whiteWon) ...{
+                            loseWidget(),
+                          } else ...{
+                            winWidget(),
+                          }
+                        }
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Padding(
+                      padding: EdgeInsets.all(2.w),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          SizedBox(
+                            width: 10.w,
+                            height: 4.h,
+                            child: ChessUserService.getAvatarFromUrl(
+                                match.black!.avatarUrl!),
+                          ),
+                          Text(
+                            match.black!.name!,
+                            style: TextStyle(
+                              fontSize: 9.sp,
+                            ),
+                          ),
+                          Text(
+                            "Rating: " + match.black!.rating.toString(),
+                            style: TextStyle(
+                              fontSize: 9.sp,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
               ),
-            ),
+            );
+          }
+        });
+  }
+
+  Widget drawWidget() {
+    return Container(
+      decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.grey,
           ),
-          Expanded(
-            flex: 1,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(.5.w),
-                  child: Text(
-                    "VS",
-                    style: TextStyle(
-                      fontSize: 9.sp,
-                    ),
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () => startMatch(match),
-                  child: Text(
-                    "Start",
-                    style: TextStyle(
-                      fontSize: 9.sp,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          borderRadius: BorderRadius.all(Radius.circular(1.w))),
+      child: Padding(
+        padding: EdgeInsets.all(1.w),
+        child: Text(
+          "Draw",
+          style: TextStyle(
+            fontSize: 9.sp,
           ),
-          Expanded(
-            flex: 1,
-            child: Padding(
-              padding: EdgeInsets.all(2.w),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  SizedBox(
-                    width: 10.w,
-                    height: 4.h,
-                    child: ChessUserService.getAvatarFromUrl(
-                        match.black!.avatarUrl!),
-                  ),
-                  Text(
-                    match.black!.name!,
-                    style: TextStyle(
-                      fontSize: 9.sp,
-                    ),
-                  ),
-                  Text(
-                    "Rating: " + match.black!.rating.toString(),
-                    style: TextStyle(
-                      fontSize: 9.sp,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+        ),
+      ),
+    );
+  }
+
+  Widget winWidget() {
+    return Container(
+      decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.green,
           ),
-        ],
+          borderRadius: BorderRadius.all(Radius.circular(1.w))),
+      child: Padding(
+        padding: EdgeInsets.all(1.w),
+        child: Text(
+          "Win",
+          style: TextStyle(
+            fontSize: 9.sp,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget loseWidget() {
+    return Container(
+      decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.red,
+          ),
+          borderRadius: BorderRadius.all(Radius.circular(1.w))),
+      child: Padding(
+        padding: EdgeInsets.all(1.w),
+        child: Text(
+          "Lose",
+          style: TextStyle(
+            fontSize: 9.sp,
+          ),
+        ),
       ),
     );
   }
