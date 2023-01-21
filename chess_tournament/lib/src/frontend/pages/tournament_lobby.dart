@@ -35,8 +35,8 @@ class TournamentLobbyScreenState
   @override
   void initState() {
     super.initState();
-    participants = TournamentService.getTournamentParticipants(
-        context, widget.tournamentCode);
+    participants =
+        TournamentService.getTournamentParticipants(widget.tournamentCode);
     // setUpTimedFetch();
   }
 
@@ -60,7 +60,7 @@ class TournamentLobbyScreenState
         setState(
           () {
             participants = TournamentService.getTournamentParticipants(
-                context, widget.tournamentCode);
+                widget.tournamentCode);
           },
         );
       },
@@ -72,23 +72,16 @@ class TournamentLobbyScreenState
     var settings = await TournamentSettingsService.getTournamentSettings(
         widget.tournamentCode);
     var participants = await TournamentService.getTournamentParticipants(
-        context, widget.tournamentCode);
+        widget.tournamentCode);
     var x = await TournamentService.generateRoundRobin(
         participants, settings, widget.tournamentCode);
-    for (int i = 0; i < x.length; i++) {
-      print(i.toString() +
-          ": " +
-          x[i]!.white!.userId! +
-          " vs " +
-          x[i]!.black!.userId!);
-    }
 
-    TournamentService.setTournamentMatches(x);
-    // Navigator.of(context).push(
-    //   MaterialPageRoute(
-    //     builder: (context) => const TournamentOverviewScreen(),
-    //   ),
-    // );
+    await TournamentService.setTournamentMatches(x);
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const TournamentOverviewScreen(),
+      ),
+    );
   }
 
   void goToTournament() {

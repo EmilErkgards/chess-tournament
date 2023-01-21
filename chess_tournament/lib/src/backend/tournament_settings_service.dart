@@ -61,25 +61,23 @@ class TournamentSettingsService {
       String tournamentCode) async {
     var response;
 
-    var instance = FirebaseFirestore.instance;
     try {
-      await instance.collection('tournaments').get().then((value) => {
-            value.docs.forEach((element) async {
-              if (element.data()["code"].toString() == tournamentCode) {
-                var collection = instance.collection('tournamentSettings');
+      var instance = FirebaseFirestore.instance;
+      var tournamentCollection = await instance
+          .collection('tournaments')
+          .where('code', isEqualTo: tournamentCode)
+          .get();
+      var tournamentSettingsCollection =
+          await instance.collection('tournamentSettings').get();
 
-                //TODO: THIS LINE CRASHES: WHYWRY WHAUID HWQY/UD HASYK
-                var firebaseResponse = await collection.get();
-
-                var settingsId = element.data()["settings"].toString();
-                firebaseResponse.docs.forEach((element2) {
-                  if (element2.id == settingsId) {
-                    response = element2;
-                  }
-                });
-              }
-            })
-          });
+      tournamentCollection.docs.forEach((element) {
+        var settingsId = element.data()["settings"].toString();
+        tournamentSettingsCollection.docs.forEach((element2) {
+          if (element2.id == settingsId) {
+            response = element2;
+          }
+        });
+      });
     } catch (error) {
       print("getTournamentSettings" + error.toString());
     }
