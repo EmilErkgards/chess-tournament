@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:chess_tournament/src/backend/backend_file.dart';
 import 'package:chess_tournament/src/backend/match_service.dart';
 import 'package:chess_tournament/src/backend/tournament_settings_service.dart';
+import 'package:chess_tournament/src/backend/tournament_stats_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -75,6 +76,10 @@ class TournamentService {
     } catch (error) {
       print(error);
     }
+    // for (var participant in participants) {
+    //   var statsId = await createDefaultTournamentStats(participant);
+    //   createUserTournamentStatsRelation(participant, statsId, tournamentCode);
+    // }
     return participants;
   }
 
@@ -138,6 +143,45 @@ class TournamentService {
     return code.toString();
   }
 
+  static Future<String> createDefaultTournamentStats(ChessUser user) async {
+    String? id;
+    try {
+      id = (await FirebaseFirestore.instance.collection('tournamentStats').add(
+        {
+          "userDocId": user.docId,
+          "wins": 0,
+          "draws": 0,
+          "losses": 0,
+          "points": 0,
+        },
+      ))
+          .id;
+    } catch (error) {
+      print("createDefaultTournamentSettings" + error.toString());
+    }
+
+    return id!;
+  }
+
+  static Future<String> createUserTournamentStatsRelation(
+      ChessUser user, String statsDocId, String tournamentCode) async {
+    String? id;
+    try {
+      id = (await FirebaseFirestore.instance
+              .collection('tournamentUserStats')
+              .add({
+        "userDocId": user.docId,
+        "statsDocId": statsDocId,
+        "tournamentCode": tournamentCode,
+      }))
+          .id;
+    } catch (error) {
+      print("createDefaultTournamentSettings" + error.toString());
+    }
+
+    return id!;
+  }
+
   static Future<bool> addUserToTournament(User user, String code) async {
     var codeExists = await codeExistsInDB(code);
 
@@ -154,6 +198,8 @@ class TournamentService {
           .collection('users')
           .doc(chessUser.docId)
           .update({"tournamentCode": code});
+      var statsId = await createDefaultTournamentStats(chessUser);
+      createUserTournamentStatsRelation(chessUser, statsId, code);
     } catch (error) {
       print("addUserToTournament" + error.toString());
     }
@@ -258,7 +304,7 @@ class TournamentService {
             black: black,
             whiteTime: whiteTime,
             blackTime: blackTime,
-            result: ChessMatchState.notStarted,
+            result: ChessMatchResult.notStarted,
           ),
         );
       }
@@ -390,5 +436,19 @@ class TournamentService {
     } catch (error) {
       print("leaveTournament" + error.toString());
     }
+  }
+
+  static Future<List<TournamentUserStats>> getLeaderBoard(
+      String tournamentCode) async {
+    List<TournamentUserStats> usersStats = List.empty(growable: true);
+    var participants =
+        await TournamentService.getTournamentParticipants(tournamentCode);
+    for (var participant in participants) {
+      var stats = await TournamentStatsService.getTournamentStats(participant);
+      usersStats.add(TournamentUserStats(
+          user: participant, stats: stats, tournamentCode: tournamentCode));
+    }
+    usersStats.sort(((a, b) => b.stats!.points!.compareTo(a.stats!.points!)));
+    return usersStats;
   }
 }

@@ -1,5 +1,6 @@
 import 'package:chess_tournament/src/backend/match_service.dart';
 import 'package:chess_tournament/src/backend/tournament_service.dart';
+import 'package:chess_tournament/src/backend/tournament_stats_service.dart';
 import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:chess_tournament/src/frontend/pages/chess_clock.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -43,10 +44,13 @@ class _TournamentOverviewScreenState
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Padding(
-          //   padding: const EdgeInsets.all(40),
-          //   child: minimizedLeaderBoard(),
-          // ),
+          Expanded(
+            flex: 3,
+            child: Padding(
+              padding: const EdgeInsets.all(40),
+              child: minimizedLeaderBoard(),
+            ),
+          ),
           Expanded(
             flex: 7,
             child: Padding(
@@ -59,42 +63,54 @@ class _TournamentOverviewScreenState
     );
   }
 
-  late List<ChessUser> participants = [
-    ChessUser(name: "Emil", rating: "1215", userId: "bla"),
-    ChessUser(name: "Anton", rating: "1500", userId: "bla"),
-    ChessUser(name: "Oskar", rating: "420", userId: "bla"),
-    ChessUser(name: "Joel", rating: "69", userId: "bla"),
-    ChessUser(name: "Anton", rating: "1337", userId: "bla"),
-  ];
+  Widget minimizedLeaderBoard() {
+    Future<List<TournamentUserStats>> leaderBoard =
+        TournamentService.getLeaderBoard(widget.tournamentCode);
+    var index = 0;
+    return FutureBuilder(
+      future: leaderBoard,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else {
+          return ListView(
+            shrinkWrap: true,
+            children: snapshot.data!.map((participant) {
+              index++;
+              return Center(
+                child: SizedBox(
+                  width: 400,
+                  height: 60,
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Center(
+                        child: leaderBoardCard(participant, index),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          );
+        }
+      },
+    );
+  }
 
-  // Widget minimizedLeaderBoard() {
-  //   return ListView(
-  //     shrinkWrap: true,
-  //     children: topThree.map((participant) {
-  //       return Center(
-  //         child: SizedBox(
-  //           width: 400,
-  //           height: 60,
-  //           child: Card(
-  //             child: Padding(
-  //               padding: const EdgeInsets.all(8.0),
-  //               child: Center(
-  //                 child: leaderBoardCard(participant),
-  //               ),
-  //             ),
-  //           ),
-  //         ),
-  //       );
-  //     }).toList(),
-  //   );
-  // }
-
-  Widget leaderBoardCard(ChessUser participant) {
+  Widget leaderBoardCard(
+      TournamentUserStats tournamentUserStats, int placement) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(participant.name!),
-        Text("W: 5, L: 2, D: 4"),
+        Text(placement.toString() + "."),
+        Text(tournamentUserStats.user!.name!),
+        Text("W: " + tournamentUserStats.stats!.wins!.toString()),
+        Text("D: " + tournamentUserStats.stats!.draws!.toString()),
+        Text("L: " + tournamentUserStats.stats!.losses!.toString()),
+        Text("P: " + tournamentUserStats.stats!.points!.toString()),
       ],
     );
   }
@@ -181,7 +197,7 @@ class _TournamentOverviewScreenState
                             ),
                           ),
                         ),
-                        if (match.result == ChessMatchState.notStarted) ...{
+                        if (match.result == ChessMatchResult.notStarted) ...{
                           ElevatedButton(
                             onPressed: () => startMatch(match),
                             child: Text(
@@ -191,17 +207,17 @@ class _TournamentOverviewScreenState
                               ),
                             ),
                           ),
-                        } else if (match.result == ChessMatchState.draw) ...{
+                        } else if (match.result == ChessMatchResult.draw) ...{
                           drawWidget(),
                         } else if (match.white!.docId ==
                             snapshot.data!.docId) ...{
-                          if (match.result == ChessMatchState.whiteWon) ...{
+                          if (match.result == ChessMatchResult.whiteWon) ...{
                             winWidget(),
                           } else ...{
                             loseWidget(),
                           }
                         } else ...{
-                          if (match.result == ChessMatchState.whiteWon) ...{
+                          if (match.result == ChessMatchResult.whiteWon) ...{
                             loseWidget(),
                           } else ...{
                             winWidget(),

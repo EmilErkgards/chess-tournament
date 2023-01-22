@@ -212,10 +212,10 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
     if (timeRanOut) {
       if (whitesTimeInMilliSeconds <= 0) {
         ChessMatchService.updateMatchResult(
-            widget.currentMatch, ChessMatchState.blackWon);
+            widget.currentMatch, ChessMatchResult.blackWon);
       } else {
         ChessMatchService.updateMatchResult(
-            widget.currentMatch, ChessMatchState.whiteWon);
+            widget.currentMatch, ChessMatchResult.whiteWon);
       }
     }
   }
@@ -250,7 +250,7 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
             ElevatedButton(
               onPressed: () {
                 ChessMatchService.updateMatchResult(
-                    widget.currentMatch, ChessMatchState.whiteWon);
+                    widget.currentMatch, ChessMatchResult.whiteWon);
                 Navigator.of(context).pop();
               },
               child: const Text('White Won'),
@@ -258,7 +258,7 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
             ElevatedButton(
               onPressed: () {
                 ChessMatchService.updateMatchResult(
-                    widget.currentMatch, ChessMatchState.draw);
+                    widget.currentMatch, ChessMatchResult.draw);
                 Navigator.of(context).pop();
               },
               child: const Text('Draw'),
@@ -266,7 +266,7 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
             ElevatedButton(
               onPressed: () {
                 ChessMatchService.updateMatchResult(
-                    widget.currentMatch, ChessMatchState.blackWon);
+                    widget.currentMatch, ChessMatchResult.blackWon);
                 Navigator.of(context).pop();
               },
               child: const Text('Black Won'),
