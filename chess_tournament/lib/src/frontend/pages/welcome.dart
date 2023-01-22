@@ -6,11 +6,13 @@ import 'package:flutter/scheduler.dart';
 import '../base_screen.dart';
 
 class WelcomeScreen extends BasePageScreen {
+  const WelcomeScreen({super.key});
+
   @override
-  _WelcomeScreenState createState() => _WelcomeScreenState();
+  WelcomeScreenState createState() => WelcomeScreenState();
 }
 
-class _WelcomeScreenState extends BasePageScreenState<WelcomeScreen>
+class WelcomeScreenState extends BasePageScreenState<WelcomeScreen>
     with BaseScreen {
   @override
   void initState() {

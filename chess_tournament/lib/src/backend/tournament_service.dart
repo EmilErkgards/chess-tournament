@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:math';
 
 import 'package:chess_tournament/src/backend/chessuser_service.dart';
@@ -116,7 +118,7 @@ class TournamentService {
       }))
           .id;
     } catch (error) {
-      print("createDefaultTournamentSettings" + error.toString());
+      print("createDefaultTournamentSettings$error");
     }
 
     return id!;
@@ -137,7 +139,7 @@ class TournamentService {
         "owner": owner.docId
       });
     } catch (error) {
-      print("addTournament" + error.toString());
+      print("addTournament$error");
     }
 
     return code.toString();
@@ -157,7 +159,7 @@ class TournamentService {
       ))
           .id;
     } catch (error) {
-      print("createDefaultTournamentSettings" + error.toString());
+      print("createDefaultTournamentSettings$error");
     }
 
     return id!;
@@ -176,7 +178,7 @@ class TournamentService {
       }))
           .id;
     } catch (error) {
-      print("createDefaultTournamentSettings" + error.toString());
+      print("createDefaultTournamentSettings$error");
     }
 
     return id!;
@@ -191,7 +193,7 @@ class TournamentService {
 
     var chessUser = await ChessUserService.getChessUserByUserId(user.uid);
     if (chessUser == null) {
-      throw "Could not find chess user with uuid: " + user.uid;
+      throw "Could not find chess user with uuid: ${user.uid}";
     }
     try {
       FirebaseFirestore.instance
@@ -201,7 +203,7 @@ class TournamentService {
       var statsId = await createDefaultTournamentStats(chessUser);
       createUserTournamentStatsRelation(chessUser, statsId, code);
     } catch (error) {
-      print("addUserToTournament" + error.toString());
+      print("addUserToTournament$error");
     }
     return true;
   }
@@ -219,7 +221,7 @@ class TournamentService {
         }
       }
     } catch (error) {
-      print("isTournamentOwner" + error.toString());
+      print("isTournamentOwner$error");
     }
 
     return retVal;
@@ -243,7 +245,7 @@ class TournamentService {
         }
       }
     } catch (error) {
-      print("isTournamentStarted" + error.toString());
+      print("isTournamentStarted$error");
     }
 
     return retVal;
@@ -326,7 +328,7 @@ class TournamentService {
         });
       }
     } catch (error) {
-      print("setTournamentMatches" + error.toString());
+      print("setTournamentMatches$error");
     }
 
     for (int i = 0; i < matches.length; i++) {
@@ -340,7 +342,7 @@ class TournamentService {
           "result": matches[i].result!.index,
         });
       } catch (error) {
-        print("setTournamentMatches" + error.toString());
+        print("setTournamentMatches$error");
       }
     }
   }
@@ -400,7 +402,7 @@ class TournamentService {
         }
       }
     } catch (error) {
-      print("deleteTournament" + error.toString());
+      print("deleteTournament$error");
     }
 
     try {
@@ -415,7 +417,7 @@ class TournamentService {
             .update({"tournamentCode": ""});
       }
     } catch (error) {
-      print("deleteTournament" + error.toString());
+      print("deleteTournament$error");
     }
   }
 
@@ -434,7 +436,7 @@ class TournamentService {
         }
       }
     } catch (error) {
-      print("leaveTournament" + error.toString());
+      print("leaveTournament$error");
     }
   }
 

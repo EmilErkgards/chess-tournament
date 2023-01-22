@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:chess_tournament/src/frontend/common/base_button.dart';
 import 'package:chess_tournament/src/frontend/common/base_input_field.dart';
@@ -7,11 +9,13 @@ import 'package:flutter/scheduler.dart';
 import 'package:sizer/sizer.dart';
 
 class LoginScreen extends BasePageScreen {
+  const LoginScreen({super.key});
+
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  LoginScreenState createState() => LoginScreenState();
 }
 
-class _LoginScreenState extends BasePageScreenState<LoginScreen>
+class LoginScreenState extends BasePageScreenState<LoginScreen>
     with BaseScreen {
   final _auth = FirebaseAuth.instance;
   bool showSpinner = false;
@@ -55,7 +59,7 @@ class _LoginScreenState extends BasePageScreenState<LoginScreen>
                         numbersOnly: false,
                         placeholderText: 'Email',
                         textFieldController: emailController,
-                        validatorCallback: (String) {},
+                        validatorCallback: (string) {},
                       ),
                     ),
                   ),
@@ -67,7 +71,7 @@ class _LoginScreenState extends BasePageScreenState<LoginScreen>
                         numbersOnly: false,
                         placeholderText: 'Password',
                         textFieldController: passwordController,
-                        validatorCallback: (String) {},
+                        validatorCallback: (string) {},
                         valueVisible: false,
                         callbackOnSubmitted: tryLoginCallback,
                       ),
@@ -111,11 +115,10 @@ class _LoginScreenState extends BasePageScreenState<LoginScreen>
       showSpinner = true;
     });
     try {
-      final user = await _auth.signInWithEmailAndPassword(
+      await _auth.signInWithEmailAndPassword(
           email: emailController.text, password: passwordController.text);
-      if (user != null) {
-        Navigator.pushNamed(context, "/");
-      }
+      if (!mounted) return;
+      Navigator.pushNamed(context, "/");
     } catch (e) {
       print(e);
     }

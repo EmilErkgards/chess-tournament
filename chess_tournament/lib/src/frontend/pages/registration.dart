@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:chess_tournament/src/backend/chessuser_service.dart';
 import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:chess_tournament/src/frontend/common/base_button.dart';
@@ -8,11 +10,13 @@ import 'package:flutter/scheduler.dart';
 import 'package:sizer/sizer.dart';
 
 class RegistrationScreen extends BasePageScreen {
+  const RegistrationScreen({super.key});
+
   @override
-  _RegistrationScreenState createState() => _RegistrationScreenState();
+  RegistrationScreenState createState() => RegistrationScreenState();
 }
 
-class _RegistrationScreenState extends BasePageScreenState<RegistrationScreen>
+class RegistrationScreenState extends BasePageScreenState<RegistrationScreen>
     with BaseScreen {
   final _auth = FirebaseAuth.instance;
   bool showSpinner = false;
@@ -58,9 +62,7 @@ class _RegistrationScreenState extends BasePageScreenState<RegistrationScreen>
                         numbersOnly: false,
                         placeholderText: 'Email',
                         textFieldController: emailController,
-                        validatorCallback: (String) {
-                          //TODO check if already registered
-                        },
+                        validatorCallback: (string) {},
                       ),
                     ),
                   ),
@@ -72,9 +74,7 @@ class _RegistrationScreenState extends BasePageScreenState<RegistrationScreen>
                         numbersOnly: false,
                         placeholderText: 'Chess.com Username',
                         textFieldController: chessUsernameController,
-                        validatorCallback: (String) {
-                          //TODO Check if exists
-                        },
+                        validatorCallback: (string) {},
                       ),
                     ),
                   ),
@@ -86,7 +86,7 @@ class _RegistrationScreenState extends BasePageScreenState<RegistrationScreen>
                         numbersOnly: false,
                         placeholderText: 'Password',
                         textFieldController: passwordController,
-                        validatorCallback: (String) {},
+                        validatorCallback: (string) {},
                         valueVisible: false,
                       ),
                     ),
@@ -152,6 +152,7 @@ class _RegistrationScreenState extends BasePageScreenState<RegistrationScreen>
       user.userId = newUser.user!.uid;
       user.docId = (await ChessUserService.addUserToDB(user)).id;
 
+      if (!mounted) return;
       Navigator.pushNamed(context, '/');
     } catch (e) {
       print(e);

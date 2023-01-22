@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DarkThemePreference {
-  static const THEME_STATUS = "THEMESTATUS";
+  static const themeStatus = "THEMESTATUS";
 
   setDarkTheme(bool value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool(THEME_STATUS, value);
+    prefs.setBool(themeStatus, value);
   }
 
   Future<bool> getTheme() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(THEME_STATUS) ?? false;
+    return prefs.getBool(themeStatus) ?? false;
   }
 }
 
@@ -30,7 +30,7 @@ class DarkThemeProvider with ChangeNotifier {
 
 class Styles {
   static ThemeData themeData(bool isDarkTheme, BuildContext context) {
-    Color baseGreen = Color(0xff739749);
+    Color baseGreen = const Color(0xff739749);
     List strengths = <double>[.05];
     Map<int, Color> swatch = {};
     final int r = baseGreen.red, g = baseGreen.green, b = baseGreen.blue;
@@ -48,11 +48,11 @@ class Styles {
       );
     }
 
-    Color darkBG = Color.fromARGB(255, 71, 66, 62);
-    Color darkCard = Color(0xff211F1E);
+    Color darkBG = const Color.fromARGB(255, 71, 66, 62);
+    Color darkCard = const Color(0xff211F1E);
 
-    Color lightBG = Color(0xffF0F0F0);
-    Color lightCard = Color(0XFFE1E0E0);
+    Color lightBG = const Color(0xffF0F0F0);
+    Color lightCard = const Color(0XFFE1E0E0);
 
     return ThemeData(
       primarySwatch: MaterialColor(baseGreen.value, swatch),
@@ -73,7 +73,9 @@ class Styles {
       // canvasColor: isDarkTheme ? Colors.black : Colors.grey[50],
       brightness: isDarkTheme ? Brightness.dark : Brightness.light,
       buttonTheme: Theme.of(context).buttonTheme.copyWith(
-          colorScheme: isDarkTheme ? ColorScheme.dark() : ColorScheme.light()),
+          colorScheme: isDarkTheme
+              ? const ColorScheme.dark()
+              : const ColorScheme.light()),
       appBarTheme: AppBarTheme(
         color: isDarkTheme ? swatch[600] : swatch[500],
         elevation: 0.0,

@@ -105,12 +105,12 @@ class _TournamentOverviewScreenState
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(placement.toString() + "."),
+        Text("$placement."),
         Text(tournamentUserStats.user!.name!),
-        Text("W: " + tournamentUserStats.stats!.wins!.toString()),
-        Text("D: " + tournamentUserStats.stats!.draws!.toString()),
-        Text("L: " + tournamentUserStats.stats!.losses!.toString()),
-        Text("P: " + tournamentUserStats.stats!.points!.toString()),
+        Text("W: ${tournamentUserStats.stats!.wins!}"),
+        Text("D: ${tournamentUserStats.stats!.draws!}"),
+        Text("L: ${tournamentUserStats.stats!.losses!}"),
+        Text("P: ${tournamentUserStats.stats!.points!}"),
       ],
     );
   }
@@ -174,7 +174,7 @@ class _TournamentOverviewScreenState
                             ),
                           ),
                           Text(
-                            "Rating: " + match.white!.rating.toString(),
+                            "Rating: ${match.white!.rating}",
                             style: TextStyle(
                               fontSize: 9.sp,
                             ),
@@ -246,7 +246,7 @@ class _TournamentOverviewScreenState
                             ),
                           ),
                           Text(
-                            "Rating: " + match.black!.rating.toString(),
+                            "Rating: ${match.black!.rating}",
                             style: TextStyle(
                               fontSize: 9.sp,
                             ),

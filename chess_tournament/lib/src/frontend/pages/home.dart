@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:chess_tournament/src/backend/tournament_service.dart';
 import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:chess_tournament/src/frontend/common/base_button.dart';
@@ -39,6 +41,7 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
               currUser, currUser.tournamentCode!);
           bool isStarted = await TournamentService.isTournamentStarted(
               currUser.tournamentCode!);
+          if (!mounted) return;
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => TournamentLobbyScreen(
@@ -120,6 +123,7 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
     var owner = await ChessUserService.getChessUserByUserId(currentUser.uid);
     String code = await TournamentService.addTournament(owner!);
     await TournamentService.addUserToTournament(currentUser, code);
+    if (!mounted) return;
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => TournamentLobbyScreen(
@@ -145,6 +149,7 @@ class HomeScreenState extends BasePageScreenState<HomeScreen> with BaseScreen {
         await TournamentService.addUserToTournament(currentUser, value)) {
       bool isOwner = await TournamentService.isTournamentOwner(
           currUser!, currUser.tournamentCode!);
+      if (!mounted) return;
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => TournamentLobbyScreen(

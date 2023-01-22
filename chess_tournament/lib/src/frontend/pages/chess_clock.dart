@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class ChessClockScreen extends BasePageScreen {
-  ChessMatch currentMatch;
+  final ChessMatch currentMatch;
 
-  ChessClockScreen({
+  const ChessClockScreen({
     super.key,
     required this.currentMatch,
   });
@@ -42,7 +42,7 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
       blacksTimeInMilliSeconds.toInt(),
     ));
     timer = Timer.periodic(
-      Duration(milliseconds: 10),
+      const Duration(milliseconds: 10),
       (Timer t) => {
         timerLogic(),
       },
@@ -101,7 +101,7 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
                     width: 100,
                     child: ElevatedButton(
                       onPressed: onPauseButtonPressed,
-                      child: Icon(Icons.pause),
+                      child: const Icon(Icons.pause),
                     ),
                   ),
                   SizedBox(
@@ -109,7 +109,7 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
                     width: 100,
                     child: ElevatedButton(
                       onPressed: onPlayButtonPressed,
-                      child: Icon(Icons.play_arrow),
+                      child: const Icon(Icons.play_arrow),
                     ),
                   ),
                   SizedBox(
@@ -117,7 +117,7 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
                     width: 100,
                     child: ElevatedButton(
                       onPressed: onStopButtonPressed,
-                      child: Icon(Icons.stop),
+                      child: const Icon(Icons.stop),
                     ),
                   ),
                 ],

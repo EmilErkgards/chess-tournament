@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TournamentSettings {
@@ -51,7 +53,7 @@ class TournamentSettingsService {
         });
       }
     } catch (error) {
-      print("setTournamentSettings" + error.toString());
+      print("setTournamentSettings$error");
     }
   }
 
@@ -77,7 +79,7 @@ class TournamentSettingsService {
         }
       }
     } catch (error) {
-      print("getTournamentSettings" + error.toString());
+      print("getTournamentSettings$error");
     }
     throw "tournament not found";
   }

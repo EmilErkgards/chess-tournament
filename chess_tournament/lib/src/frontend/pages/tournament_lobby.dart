@@ -13,9 +13,9 @@ import 'package:sizer/sizer.dart';
 class TournamentLobbyScreen extends BasePageScreen {
   final String tournamentCode;
   final bool isOwner;
-  bool isStarted;
+  final bool isStarted;
 
-  TournamentLobbyScreen({
+  const TournamentLobbyScreen({
     super.key,
     required this.tournamentCode,
     required this.isOwner,
@@ -70,7 +70,7 @@ class TournamentLobbyScreenState
     //TODO start tournament
     TournamentService.startTournament(
         widget.tournamentCode, await participants!);
-
+    if (!mounted) return;
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) =>
@@ -92,6 +92,7 @@ class TournamentLobbyScreenState
     TournamentSettings settings =
         await TournamentSettingsService.getTournamentSettings(
             widget.tournamentCode);
+    if (!mounted) return;
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => TournamentSettingsScreen(

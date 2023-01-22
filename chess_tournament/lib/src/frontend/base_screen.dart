@@ -71,8 +71,8 @@ mixin BaseScreen<Page extends BasePageScreen> on BasePageScreenState<Page> {
 
   Widget body(BuildContext context);
 
-  Future<void> signOut() async {
-    await FirebaseAuth.instance.signOut();
+  void signOut() {
+    FirebaseAuth.instance.signOut();
     Navigator.pushNamed(context, "welcome_screen");
   }
 }

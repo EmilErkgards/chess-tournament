@@ -1,7 +1,7 @@
+// ignore_for_file: avoid_print
+
 import 'package:chess_tournament/src/backend/chessuser_service.dart';
-import 'package:chess_tournament/src/backend/tournament_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 class TournamentStats {
   String? docId;
@@ -94,7 +94,7 @@ class TournamentStatsService {
         "points": stats.points,
       });
     } catch (error) {
-      print("setTournamentSettings" + error.toString());
+      print("setTournamentSettings$error");
     }
   }
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_multi_formatter/formatters/masked_input_formatter.dart';
 
 class BaseInputField extends StatefulWidget {
   final bool numbersOnly;

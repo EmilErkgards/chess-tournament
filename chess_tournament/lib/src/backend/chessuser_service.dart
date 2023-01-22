@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:async';
 import 'dart:convert';
 
@@ -51,15 +53,13 @@ class ChessUserService {
     ChessUser? returnVal;
     try {
       var users = await FirebaseFirestore.instance.collection('users').get();
-      users.docs.forEach(
-        (doc) {
-          if (doc.id == docId) {
-            returnVal = ChessUser.fromJSON(doc.data(), doc.id);
-          }
-        },
-      );
+      for (var user in users.docs) {
+        if (user.id == docId) {
+          returnVal = ChessUser.fromJSON(user.data(), user.id);
+        }
+      }
     } catch (error) {
-      print("getUserById" + error.toString());
+      print("getUserById$error");
     }
     return returnVal;
   }
@@ -76,7 +76,7 @@ class ChessUserService {
         }
       }
     } catch (error) {
-      print("getUserByName" + error.toString());
+      print("getUserByName$error");
     }
     return returnVal;
   }
@@ -93,7 +93,7 @@ class ChessUserService {
         }
       }
     } catch (error) {
-      print("getChessUserByUUID" + error.toString());
+      print("getChessUserByUUID$error");
     }
     return returnVal;
   }

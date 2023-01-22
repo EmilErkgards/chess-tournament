@@ -24,7 +24,7 @@ void main() async {
 class MyApp extends StatelessWidget {
   MyApp({Key? key}) : super(key: key);
 
-  DarkThemeProvider themeChangeProvider = DarkThemeProvider();
+  final DarkThemeProvider themeChangeProvider = DarkThemeProvider();
 
   void getCurrentAppTheme() async {
     themeChangeProvider.darkTheme =
@@ -49,10 +49,10 @@ class MyApp extends StatelessWidget {
               initialRoute: '/',
               theme: Styles.themeData(themeChangeProvider.darkTheme, context),
               routes: {
-                'welcome_screen': (context) => WelcomeScreen(),
-                'registration_screen': (context) => RegistrationScreen(),
-                'login_screen': (context) => LoginScreen(),
-                '/': (context) => HomeScreen()
+                'welcome_screen': (context) => const WelcomeScreen(),
+                'registration_screen': (context) => const RegistrationScreen(),
+                'login_screen': (context) => const LoginScreen(),
+                '/': (context) => const HomeScreen()
               },
             );
           });

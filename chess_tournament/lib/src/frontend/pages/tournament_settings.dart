@@ -1,6 +1,5 @@
 import 'package:chess_tournament/src/backend/tournament_settings_service.dart';
 import 'package:chess_tournament/src/frontend/common/base_button.dart';
-import 'package:chess_tournament/src/frontend/common/base_input_field.dart';
 import 'package:chess_tournament/src/frontend/common/base_input_increment.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
@@ -11,18 +10,18 @@ class TournamentSettingsScreen extends BasePageScreen {
   final String tournamentCode;
   final TournamentSettings currentSettings;
 
-  TournamentSettingsScreen({
+  const TournamentSettingsScreen({
     super.key,
     required this.tournamentCode,
     required this.currentSettings,
   });
 
   @override
-  _TournamentSettingsScreenState createState() =>
-      _TournamentSettingsScreenState();
+  TournamentSettingsScreenState createState() =>
+      TournamentSettingsScreenState();
 }
 
-class _TournamentSettingsScreenState
+class TournamentSettingsScreenState
     extends BasePageScreenState<TournamentSettingsScreen> with BaseScreen {
   int gameTime = 0;
   int gameTimeMinutes = 0;
