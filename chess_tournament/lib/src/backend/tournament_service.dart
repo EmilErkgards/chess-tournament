@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:chess_tournament/src/backend/backend_file.dart';
+import 'package:chess_tournament/src/backend/chessuser_service.dart';
 import 'package:chess_tournament/src/backend/match_service.dart';
 import 'package:chess_tournament/src/backend/tournament_settings_service.dart';
 import 'package:chess_tournament/src/backend/tournament_stats_service.dart';
@@ -450,5 +450,9 @@ class TournamentService {
     }
     usersStats.sort(((a, b) => b.stats!.points!.compareTo(a.stats!.points!)));
     return usersStats;
+  }
+
+  static Future<void> resetTournament(String tournamentCode) async {
+    //TODO: this would be nice for debugging
   }
 }

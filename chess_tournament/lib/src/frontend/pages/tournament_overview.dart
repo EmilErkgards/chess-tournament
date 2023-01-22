@@ -7,7 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../backend/backend_file.dart';
+import '../../backend/chessuser_service.dart';
 
 class TournamentOverviewScreen extends BasePageScreen {
   final String tournamentCode;
@@ -66,7 +66,6 @@ class _TournamentOverviewScreenState
   Widget minimizedLeaderBoard() {
     Future<List<TournamentUserStats>> leaderBoard =
         TournamentService.getLeaderBoard(widget.tournamentCode);
-    var index = 0;
     return FutureBuilder(
       future: leaderBoard,
       builder: (context, snapshot) {
@@ -75,6 +74,7 @@ class _TournamentOverviewScreenState
             child: CircularProgressIndicator(),
           );
         } else {
+          var index = 0;
           return ListView(
             shrinkWrap: true,
             children: snapshot.data!.map((participant) {
@@ -320,7 +320,12 @@ class _TournamentOverviewScreenState
   }
 
   void startMatch(ChessMatch match) {
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => ChessClockScreen(currentMatch: match)));
+    Navigator.of(context)
+        .push(MaterialPageRoute(
+            builder: (context) => ChessClockScreen(currentMatch: match)))
+        .then((value) {
+      matches = TournamentService.getTournamentMatches(widget.tournamentCode);
+      setState(() {});
+    });
   }
 }

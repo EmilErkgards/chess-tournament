@@ -1,4 +1,4 @@
-import 'package:chess_tournament/src/backend/backend_file.dart';
+import 'package:chess_tournament/src/backend/chessuser_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum ChessMatchResult {
@@ -53,11 +53,53 @@ class ChessMatchService {
     return ChessMatchResult.values[number];
   }
 
+  static String getStatsDocFieldName(ChessMatchResult result, bool isWhite) {
+    if (result == ChessMatchResult.whiteWon) {
+      if (isWhite) {
+        return "wins";
+      } else {
+        return "losses";
+      }
+    } else if (result == ChessMatchResult.blackWon) {
+      if (isWhite) {
+        return "losses";
+      } else {
+        return "wins";
+      }
+    } else {
+      return "draws";
+    }
+  }
+
+  static Future<void> updateUserStats(
+      ChessUser user, ChessMatchResult state, bool isWhite) async {
+    var userStats = await FirebaseFirestore.instance
+        .collection('tournamentUserStats')
+        .where("userDocId", isEqualTo: user.docId)
+        .get();
+    var result = getStatsDocFieldName(state, isWhite);
+    var pointsGained = 0;
+    if (result == "wins") {
+      pointsGained = 2;
+    } else if (result == "draws") {
+      pointsGained = 1;
+    }
+    await FirebaseFirestore.instance
+        .collection("tournamentStats")
+        .doc(userStats.docs[0].data()["statsDocId"])
+        .update({
+      result: FieldValue.increment(1),
+      "points": FieldValue.increment(pointsGained)
+    });
+  }
+
   static Future<void> updateMatchResult(
       ChessMatch match, ChessMatchResult state) async {
     await FirebaseFirestore.instance
         .collection('matches')
         .doc(match.docId)
         .update({"result": state.index});
+    await updateUserStats(match.white!, state, true);
+    await updateUserStats(match.black!, state, false);
   }
 }
