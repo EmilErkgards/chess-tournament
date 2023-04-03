@@ -1,13 +1,16 @@
 import 'dart:async';
-import 'dart:convert';
 
+import 'package:chess_tournament/src/backend/match_service.dart';
 import 'package:chess_tournament/src/frontend/base_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class ChessClockScreen extends BasePageScreen {
+  final ChessMatch currentMatch;
+
   const ChessClockScreen({
     super.key,
+    required this.currentMatch,
   });
 
   @override
@@ -30,8 +33,8 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
 
   @override
   void initState() {
-    whitesTimeInMilliSeconds = 5 * 60 * 1000;
-    blacksTimeInMilliSeconds = 5 * 60 * 1000;
+    whitesTimeInMilliSeconds = widget.currentMatch.whiteTime!.toInt() * 1000;
+    blacksTimeInMilliSeconds = widget.currentMatch.blackTime!.toInt() * 1000;
     whitesTime = clockFormat.format(DateTime.fromMillisecondsSinceEpoch(
       whitesTimeInMilliSeconds.toInt(),
     ));
@@ -39,7 +42,7 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
       blacksTimeInMilliSeconds.toInt(),
     ));
     timer = Timer.periodic(
-      Duration(milliseconds: 10),
+      const Duration(milliseconds: 10),
       (Timer t) => {
         timerLogic(),
       },
@@ -59,7 +62,7 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
   }
 
   @override
-  Widget body() {
+  Widget body(BuildContext context) {
     return Center(
       child: Stack(
         children: [
@@ -82,6 +85,7 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
                           blacksTime.toString(),
                           style: const TextStyle(
                             fontSize: 100,
+                            color: Colors.grey,
                           ),
                         ),
                       ),
@@ -97,7 +101,7 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
                     width: 100,
                     child: ElevatedButton(
                       onPressed: onPauseButtonPressed,
-                      child: Icon(Icons.pause),
+                      child: const Icon(Icons.pause),
                     ),
                   ),
                   SizedBox(
@@ -105,7 +109,7 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
                     width: 100,
                     child: ElevatedButton(
                       onPressed: onPlayButtonPressed,
-                      child: Icon(Icons.play_arrow),
+                      child: const Icon(Icons.play_arrow),
                     ),
                   ),
                   SizedBox(
@@ -113,7 +117,7 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
                     width: 100,
                     child: ElevatedButton(
                       onPressed: onStopButtonPressed,
-                      child: Icon(Icons.stop),
+                      child: const Icon(Icons.stop),
                     ),
                   ),
                 ],
@@ -133,6 +137,7 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
                           whitesTime.toString(),
                           style: const TextStyle(
                             fontSize: 100,
+                            color: Colors.black,
                           ),
                         ),
                       ),
@@ -206,12 +211,12 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
     });
     if (timeRanOut) {
       if (whitesTimeInMilliSeconds <= 0) {
-        print("Black won on time. Press to continue");
+        ChessMatchService.updateMatchResult(
+            widget.currentMatch, ChessMatchResult.blackWon);
       } else {
-        print("Black won on time. Press to continue");
+        ChessMatchService.updateMatchResult(
+            widget.currentMatch, ChessMatchResult.whiteWon);
       }
-    } else {
-      print("Someone won. Pick who");
     }
   }
 
@@ -244,21 +249,24 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
           if (!timeRanOut) ...{
             ElevatedButton(
               onPressed: () {
-                registerResult();
+                ChessMatchService.updateMatchResult(
+                    widget.currentMatch, ChessMatchResult.whiteWon);
                 Navigator.of(context).pop();
               },
               child: const Text('White Won'),
             ),
             ElevatedButton(
               onPressed: () {
-                registerResult();
+                ChessMatchService.updateMatchResult(
+                    widget.currentMatch, ChessMatchResult.draw);
                 Navigator.of(context).pop();
               },
               child: const Text('Draw'),
             ),
             ElevatedButton(
               onPressed: () {
-                registerResult();
+                ChessMatchService.updateMatchResult(
+                    widget.currentMatch, ChessMatchResult.blackWon);
                 Navigator.of(context).pop();
               },
               child: const Text('Black Won'),
@@ -267,7 +275,6 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  registerResult();
                   Navigator.of(context).pop();
                 },
                 child: const Text('Continue'),
@@ -278,6 +285,4 @@ class _ChessClockScreenState extends BasePageScreenState<ChessClockScreen>
       ),
     );
   }
-
-  void registerResult() {}
 }

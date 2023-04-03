@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 class BaseInputField extends StatefulWidget {
   final bool numbersOnly;
+  final int? maxCharacters;
   final String placeholderText;
   final Function(String) validatorCallback;
   final TextEditingController? textFieldController;
@@ -16,6 +17,7 @@ class BaseInputField extends StatefulWidget {
     required this.validatorCallback,
     required this.textFieldController,
     this.valueVisible = true,
+    this.maxCharacters,
     this.callbackOnSubmitted,
   });
 
@@ -28,28 +30,24 @@ class _BaseInputFieldState extends State<BaseInputField> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: SizedBox(
-        width: 300,
-        height: height,
-        child: TextFormField(
-          obscureText: !widget.valueVisible,
-          inputFormatters: [
-            if (widget.numbersOnly) ...{
-              FilteringTextInputFormatter.digitsOnly,
-            }
-          ],
-          keyboardType: TextInputType.number,
-          validator: validator,
-          textAlign: TextAlign.center,
-          onFieldSubmitted: widget.callbackOnSubmitted,
-          controller: widget.textFieldController,
-          decoration: InputDecoration(
-            border: const OutlineInputBorder(),
-            hintText: widget.placeholderText,
-          ),
-        ),
+    return TextFormField(
+      obscureText: !widget.valueVisible,
+      inputFormatters: [
+        if (widget.numbersOnly) ...{
+          FilteringTextInputFormatter.digitsOnly,
+        },
+        if (widget.maxCharacters != null) ...{
+          LengthLimitingTextInputFormatter(widget.maxCharacters),
+        }
+      ],
+      keyboardType: TextInputType.number,
+      validator: validator,
+      textAlign: TextAlign.center,
+      onFieldSubmitted: widget.callbackOnSubmitted,
+      controller: widget.textFieldController,
+      decoration: InputDecoration(
+        border: const OutlineInputBorder(),
+        hintText: widget.placeholderText,
       ),
     );
   }
