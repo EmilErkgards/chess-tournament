@@ -113,6 +113,10 @@ class TournamentLobbyScreenState
     Navigator.of(context).pop();
   }
 
+  void resetTournament() {
+    TournamentService.resetTournament(widget.tournamentCode);
+  }
+
   @override
   Widget body(BuildContext context) {
     return Center(
@@ -178,6 +182,15 @@ class TournamentLobbyScreenState
                   text: "Go To Tournament",
                 ),
               ),
+              if (widget.isOwner) ...{
+                Padding(
+                  padding: const EdgeInsets.all(1),
+                  child: BaseButton(
+                    callback: resetTournament,
+                    text: "Reset Tournament",
+                  ),
+                ),
+              }
             } else if (widget.isOwner) ...{
               Padding(
                 padding: const EdgeInsets.all(1),

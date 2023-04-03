@@ -455,6 +455,31 @@ class TournamentService {
   }
 
   static Future<void> resetTournament(String tournamentCode) async {
-    //TODO: this would be nice for debugging
+    var codeExists = await codeExistsInDB(tournamentCode);
+
+    if (!codeExists) {
+      throw "";
+    }
+    var response = await FirebaseFirestore.instance
+        .collection('matches')
+        .where('tournamentCode', isEqualTo: tournamentCode)
+        .get();
+    for (var match in response.docs) {
+      FirebaseFirestore.instance
+          .collection('matches')
+          .doc(match.id)
+          .update({"result": 0});
+    }
+
+    var response2 = await FirebaseFirestore.instance
+        .collection('tournamentUserStats')
+        .where('tournamentCode', isEqualTo: tournamentCode)
+        .get();
+    for (var tournamentUserStat in response2.docs) {
+      FirebaseFirestore.instance
+          .collection('tournamentStats')
+          .doc(tournamentUserStat["statsDocId"])
+          .update({"draws": 0, "losses": 0, "wins": 0, "points": 0});
+    }
   }
 }
